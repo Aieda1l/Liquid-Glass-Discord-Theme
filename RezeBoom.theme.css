@@ -1,0 +1,1216 @@
+/**
+* @name Reze Boom — Liquid Glass
+* @author puckzxz#2080
+* @version 4.0
+* @description Liquid Glass edition: frosted + clear glass surfaces, chromatic aberration at edges, refraction highlights, depth, rounded corners, and animated backlit-LED glow on server hover.
+* @invite FdZhbjY
+* @source https://github.com/puckzxz/NotAnotherAnimeTheme
+* @updateUrl https://raw.githubusercontent.com/puckzxz/NotAnotherAnimeTheme/master/NotAnotherAnimeTheme.theme.css
+*/
+
+@import url(https://puckzxz.github.io/NotAnotherAnimeTheme/build/v3/naat.v3.css);
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+
+/* ================================================================
+   USER-TUNABLE VARIABLES   (original NAAT/RezeBoom knobs)
+   ================================================================ */
+:root {
+  /* Theme background image */
+  --theme-background-image: url(https://wallpapercave.com/wp/wp16127688.jpg);
+
+  /* Main theme color (purple) */
+  --main-theme-color: rgb(81, 67, 181);
+
+  /* Reduced opacity so backdrop-filter actually shows the background */
+  --theme-transparency: rgba(8, 5, 22, 0.52);
+
+  /* Home icon image */
+  --home-icon-image: url(https://i.pinimg.com/1200x/f5/c5/44/f5c544e38fbe35bfb34778145659da8b.jpg);
+  --home-icon-image-position: center center;
+  --home-icon-image-zoom: 100%;
+
+  /* Server listing width (62px = single column) */
+  --server-listing-width: 62px;
+
+  /* Font size */
+  --font-size: 100%;
+
+  /* Mention colors */
+  --mention-color: rgba(81, 67, 181, 0.18);
+  --mention-sider: rgba(81, 67, 181, 1);
+  --mention-hover-color: rgba(81, 67, 181, 0.28);
+
+  /* Server category hover */
+  --category-hover-color: rgb(113, 100, 204);
+
+  /* Unread server animation ("none" disables rainbow) */
+  --unread-server-animation: none;
+
+  /* Video / screen-share buttons */
+  --video-screen-button-background-color: rgba(255, 255, 255, 0.08);
+  --video-screen-button-foreground-color: white;
+  --video-screen-button-background-hovor-color: rgba(81, 67, 181, 0.55);
+  --video-screen-button-foreground-hovor-color: white;
+
+  /* Member-list role title color */
+  --member-listing-role-color: var(--main-theme-color);
+
+  /* User popouts */
+  --small-user-popout-background-image: var(--theme-background-image);
+  --small-user-popout-background-transparency: rgba(8, 5, 22, 0.62);
+  --small-user-popout-background-image-position: center;
+  --big-user-popout-background-image: var(--theme-background-image);
+  --big-user-popout-background-transparency: rgba(8, 5, 22, 0.62);
+  --big-user-popout-background-image-position: center;
+
+  /* Code markup */
+  --code-markup-background-color: rgba(0, 0, 0, 0.38);
+  --code-markup-border: 1px solid rgba(81, 67, 181, 0.32);
+
+  /* Message box / embeds / hover buttons */
+  --message-box-transparency: rgba(255, 255, 255, 0.04);
+  --embed-background-transparency: rgba(0, 0, 0, 0.34);
+  --message-hover-buttons-background: rgba(81, 67, 181, 0.22);
+
+  /* Context menu */
+  --context-menu-transparency: rgba(10, 7, 28, 0.72);
+
+  /* Add-server / discover icons */
+  --add-discover-icon-transparency: rgba(81, 67, 181, 0.22);
+  --add-discover-icon-color: rgb(168, 122, 255);
+
+  /* Channel limit count */
+  --channel-limit-count-color: var(--channels-default);
+  --channel-limit-background-left: rgba(255, 255, 255, 0.08);
+  --channel-limit-background-right: rgba(255, 255, 255, 0.16);
+
+  /* Scrollbar */
+  --scrollbar-color: rgba(81, 67, 181, 0.40);
+
+  /* Unread message divider */
+  --unread-message-divider-color: rgb(168, 122, 255);
+  --unread-message-divider-font-color: #fff;
+
+  /* New messages bar */
+  --new-messages-bar-background-color: rgb(81, 67, 181);
+  --new-messages-bar-font-color: #fff;
+
+  /* Emoji menu */
+  --emoji-menu-background-color: rgba(10, 7, 28, 0.74);
+  --emoji-menu-sider-background-color: rgba(0, 0, 0, 0);
+  --emoji-menu-server-header-background-color: rgba(8, 5, 22, 0.84);
+  --emoji-menu-bottom-bar-background-color: rgba(8, 5, 22, 0.88);
+  --emoji-menu-search-bar-background-color: rgba(255, 255, 255, 0.06);
+
+  /* Message search */
+  --message-search-menu-background-color: rgba(10, 7, 28, 0.80);
+  --message-search-container-background-color: rgba(0, 0, 0, 0.50);
+  --message-search-result-background-color: rgba(255, 255, 255, 0.04);
+
+  /* Channel colors */
+  --text-voice-channel-color: rgb(160, 160, 175);
+  --text-voice-channel-hover-color: #dcddde;
+  --text-voice-channel-selected-text-color: #fff;
+  --unread-text-channel-color: #e5dfff;
+  --unread-text-channel-bubble-color: var(--main-theme-color);
+
+  /* Folders */
+  --folder-background-color: rgba(20, 15, 45, 0.62);
+  --expanded-folder-background-color: transparent;
+
+  /* Reactions */
+  --reaction-emoji-background-color: rgba(0, 0, 0, 0);
+  --reaction-emoji-border-color: 1px solid transparent;
+  --reaction-emoji-hover-background-color: rgba(81, 67, 181, 0.22);
+  --reaction-emoji-hover-border-color: rgba(81, 67, 181, 0.55);
+
+  /* ================================================================
+     LIQUID GLASS TOKENS   (tune these to change the whole theme feel)
+     ================================================================ */
+
+  /* Blur tiers — heavy on chrome surfaces, thin on chat content */
+  --rz-blur-heavy:  28px;
+  --rz-blur-medium: 18px;
+  --rz-blur-light:  10px;
+  --rz-blur-thin:   5px;
+
+  /* Saturation/brightness boost behind frosted glass */
+  --rz-glass-sat: 175%;
+  --rz-glass-bri: 1.06;
+
+  /* Corner radii — Apple-style softness */
+  --rz-radius-sm: 10px;
+  --rz-radius-md: 14px;
+  --rz-radius-lg: 18px;
+  --rz-radius-xl: 22px;
+
+  /* Glass tones — translucent dark with violet undertone */
+  --rz-glass-frost:  rgba(8, 5, 22, 0.52);   /* heavy frosted chrome */
+  --rz-glass-semi:   rgba(10, 7, 28, 0.42);  /* semi-frosted chrome */
+  --rz-glass-clear:  rgba(255, 255, 255, 0.038); /* clear / non-frosted */
+  --rz-glass-deep:   rgba(10, 7, 25, 0.66);  /* modals, deep popouts */
+
+  /* Edge highlights — simulate the bright rim of real glass */
+  --rz-shine-top:    rgba(255, 255, 255, 0.22);
+  --rz-shine-side:   rgba(255, 255, 255, 0.10);
+  --rz-shine-rim:    rgba(255, 255, 255, 0.32);
+  --rz-shadow-rim:   rgba(0, 0, 0, 0.18);
+
+  /* Chromatic aberration — opposite-corner color fringes (warm + cool) */
+  --rz-ca-red:  rgba(255, 80, 110, 0.085);
+  --rz-ca-blue: rgba(80, 130, 255, 0.085);
+
+  /* Conic-rim arcs — the rotating "Apple liquid glass" specular catch */
+  --rz-rim-arc: rgba(255, 255, 255, 0.36);
+
+  /* Backlit LED palette (purple) */
+  --rz-led-core:  rgba(190, 150, 255, 0.95);
+  --rz-led-bloom: rgba(130,  90, 248, 0.72);
+  --rz-led-ring:  rgba( 81,  67, 200, 0.42);
+  --rz-led-outer: rgba( 70,  55, 200, 0.16);
+
+  /* Easing + timing */
+  --rz-ease-glass:  cubic-bezier(0.4, 0, 0.2, 1);
+  --rz-ease-spring: cubic-bezier(0.25, 1, 0.5, 1);
+  --rz-anim-fast:   180ms;
+  --rz-anim-base:   320ms;
+  --rz-anim-slow:   520ms;
+
+  /* ────────────────────────────────────────────────────────────────
+     SVG REFRACTION FILTERS — real pixel displacement of the backdrop
+     ────────────────────────────────────────────────────────────────
+     Inline SVG <filter> referenced via backdrop-filter: url(...).
+     feTurbulence generates a smooth fractal-noise map; feDisplacementMap
+     uses that map to physically warp the backdrop pixels — actual
+     lensing, not just blur. Cost scales with surface area, so applied
+     only to mid-sized hero surfaces (modals, popouts, menus, pickers).
+     To disable: set the variable to empty in :root (e.g. --rz-refract:;) */
+
+  /* Medium refraction — modals, user popouts, profile, pickers */
+  --rz-refract: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"><filter id="r"><feTurbulence type="fractalNoise" baseFrequency="0.008 0.012" numOctaves="2" seed="7" result="n"/><feGaussianBlur in="n" stdDeviation="1.5" result="nb"/><feDisplacementMap in="SourceGraphic" in2="nb" scale="10" xChannelSelector="R" yChannelSelector="G"/></filter></svg>#r');
+
+  /* Soft refraction — context menus / tooltips (text-heavy: keep subtle) */
+  --rz-refract-soft: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"><filter id="r"><feTurbulence type="fractalNoise" baseFrequency="0.012 0.018" numOctaves="1" seed="3" result="n"/><feGaussianBlur in="n" stdDeviation="1" result="nb"/><feDisplacementMap in="SourceGraphic" in2="nb" scale="5" xChannelSelector="R" yChannelSelector="G"/></filter></svg>#r');
+
+  /* Strong refraction — reserved for the largest hero surface (search modal,
+     deep popouts) where the lensing should read clearly. Use sparingly. */
+  --rz-refract-strong: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"><filter id="r"><feTurbulence type="fractalNoise" baseFrequency="0.006 0.010" numOctaves="2" seed="11" result="n"/><feGaussianBlur in="n" stdDeviation="2" result="nb"/><feDisplacementMap in="SourceGraphic" in2="nb" scale="14" xChannelSelector="R" yChannelSelector="G"/></filter></svg>#r');
+}
+
+/* ================================================================
+   ANIMATABLE PROPERTIES   (typed CSS custom props for smooth tweens)
+   ================================================================ */
+@property --rz-rim-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+@property --rz-sheen-pos {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+/* Master glow intensity for the server-icon backlight.
+   Animations run continuously; this property scales every visible value in
+   the keyframes, so transitioning it from 0 to 1 (and back) fades the glow
+   in/out smoothly. Avoids Chromium's well-known "transition fails to fire
+   when an animation is removed" issue, because the animation is never
+   removed — only its output is gated by --rz-glow. */
+@property --rz-glow {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+/* ================================================================
+   KEYFRAMES
+   ================================================================ */
+
+/* Backlit-LED breathe — pulses the bloom blobs behind the server icon.
+   Every visible value is multiplied by --rz-glow, so the animation produces
+   no glow at rest (--rz-glow: 0) and full breathing at hover (--rz-glow: 1).
+   Transitioning --rz-glow on the host listItem fades the entire effect
+   smoothly in BOTH directions, regardless of which animation frame is
+   current at the moment of hover-in / hover-out. */
+
+/* Inner core — modest pulse, stays bright */
+@keyframes rz-led-breathe-inner {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(calc(0.5 + 0.90 * var(--rz-glow)));
+    filter: blur(calc(14px + 2px * var(--rz-glow)));
+    opacity: var(--rz-glow);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(calc(0.5 + 1.15 * var(--rz-glow)));
+    filter: blur(calc(14px + 8px * var(--rz-glow)));
+    opacity: var(--rz-glow);
+  }
+}
+
+/* Outer ambient — pronounced HEARTBEAT thump:
+   scale 1.45 → 2.50, blur 20 → 40px, opacity 0.50 → 1.00 across the cycle. */
+@keyframes rz-led-breathe-outer {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(calc(0.4 + 1.05 * var(--rz-glow)));
+    filter: blur(calc(20px + 0px * var(--rz-glow)));
+    opacity: calc(0.50 * var(--rz-glow));
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(calc(0.4 + 2.10 * var(--rz-glow)));
+    filter: blur(calc(20px + 20px * var(--rz-glow)));
+    opacity: calc(1.00 * var(--rz-glow));
+  }
+}
+
+/* Drop-shadow pulse — traces the icon's actual rounded shape, not its box.
+   Drop-shadow alphas are scaled by --rz-glow so resting (--rz-glow: 0)
+   produces fully transparent shadows (no glow). */
+@keyframes rz-led-pulse {
+  0%, 100% {
+    filter:
+      brightness(calc(1 + 0.10 * var(--rz-glow)))
+      saturate(calc(1 + 0.18 * var(--rz-glow)))
+      drop-shadow(0 0  3px rgba(190, 150, 255, calc(0.95 * var(--rz-glow))))
+      drop-shadow(0 0  8px rgba(130,  90, 248, calc(0.72 * var(--rz-glow))))
+      drop-shadow(0 0 16px rgba( 81,  67, 200, calc(0.42 * var(--rz-glow))))
+      drop-shadow(0 0 28px rgba( 70,  55, 200, calc(0.16 * var(--rz-glow))));
+  }
+  50% {
+    filter:
+      brightness(calc(1 + 0.18 * var(--rz-glow)))
+      saturate(calc(1 + 0.28 * var(--rz-glow)))
+      drop-shadow(0 0  5px rgba(190, 150, 255, calc(0.95 * var(--rz-glow))))
+      drop-shadow(0 0 12px rgba(130,  90, 248, calc(0.72 * var(--rz-glow))))
+      drop-shadow(0 0 24px rgba( 81,  67, 200, calc(0.42 * var(--rz-glow))))
+      drop-shadow(0 0 40px rgba( 70,  55, 200, calc(0.16 * var(--rz-glow))));
+  }
+}
+
+/* Slow conic-rim rotation — subtle "light catching the edge of glass" */
+@keyframes rz-rim-rotate {
+  to { --rz-rim-angle: 360deg; }
+}
+
+/* Shimmer sweep — sliding sheen across deep-glass surfaces */
+@keyframes rz-shimmer {
+  0%   { --rz-sheen-pos:   0%; }
+  100% { --rz-sheen-pos: 200%; }
+}
+
+/* ================================================================
+   APP BACKGROUND   (subtle vignette under the wallpaper)
+   ================================================================ */
+
+[class*="appMount_"],
+[class*="appMount-"] {
+  position: relative;
+}
+
+[class*="appMount_"]::after,
+[class*="appMount-"]::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(81, 67, 181, 0.10), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 50% 100%, rgba(0, 0, 0, 0.25), transparent 60%);
+  mix-blend-mode: soft-light;
+}
+
+/* ================================================================
+   GUILD / SERVER BAR   — Heavy frosted glass with refraction + CA
+   ================================================================ */
+
+[class*="guilds_"],
+[class*="guilds-"] {
+  background-color: var(--rz-glass-frost) !important;
+  backdrop-filter: var(--rz-refract-soft) blur(var(--rz-blur-heavy)) saturate(var(--rz-glass-sat)) brightness(var(--rz-glass-bri)) !important;
+  -webkit-backdrop-filter: var(--rz-refract-soft) blur(var(--rz-blur-heavy)) saturate(var(--rz-glass-sat)) brightness(var(--rz-glass-bri)) !important;
+  box-shadow:
+    inset  1px  0 0 0 var(--rz-shine-side),
+    inset  0  1px 0 0 var(--rz-shine-top),
+    3px 0 28px rgba(0, 0, 0, 0.40),
+    1px 0  8px rgba(0, 0, 0, 0.25) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.09) !important;
+  position: relative;
+  isolation: isolate;
+  z-index: 1;
+}
+
+/* Refraction band + chromatic aberration overlay on the guild bar */
+[class*="guilds_"]::after,
+[class*="guilds-"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 30% at 0%   8%,  var(--rz-ca-red)  0%, transparent 55%),
+    radial-gradient(ellipse 80% 30% at 100% 92%, var(--rz-ca-blue) 0%, transparent 55%),
+    linear-gradient(155deg,
+      rgba(255, 255, 255, 0.065) 0%,
+      rgba(255, 255, 255, 0.020) 25%,
+      transparent 50%,
+      rgba(0, 0, 0, 0.025) 75%,
+      rgba(0, 0, 0, 0.045) 100%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Bright top-edge refraction seam (where light catches the rim) */
+[class*="guilds_"]::before,
+[class*="guilds-"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 6px;
+  right: 6px;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--rz-shine-rim) 50%,
+    transparent 100%);
+  pointer-events: none;
+  z-index: 11;
+}
+
+/* ================================================================
+   CHANNEL SIDEBAR   — Semi-frosted glass
+   ================================================================ */
+
+[class*="sidebar_"]:not([class*="chat"]):not([class*="Sidebar"]),
+[class*="sidebar-"]:not([class*="chat"]):not([class*="Sidebar"]) {
+  background-color: var(--rz-glass-semi) !important;
+  backdrop-filter: var(--rz-refract-soft) blur(var(--rz-blur-medium)) saturate(165%) !important;
+  -webkit-backdrop-filter: var(--rz-refract-soft) blur(var(--rz-blur-medium)) saturate(165%) !important;
+  box-shadow:
+    inset  0  1px 0 0 var(--rz-shine-top),
+    inset  1px 0 0 0 var(--rz-shine-side),
+    inset -1px 0 0 0 var(--rz-shadow-rim),
+    2px 0 20px rgba(0, 0, 0, 0.30) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+  position: relative;
+  isolation: isolate;
+}
+
+/* Sidebar refraction + CA */
+[class*="sidebar_"]:not([class*="chat"]):not([class*="Sidebar"])::before,
+[class*="sidebar-"]:not([class*="chat"]):not([class*="Sidebar"])::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 40% at 0%   0%,   var(--rz-ca-red)  0%, transparent 50%),
+    radial-gradient(ellipse 70% 40% at 100% 100%, var(--rz-ca-blue) 0%, transparent 50%),
+    linear-gradient(155deg,
+      rgba(255, 255, 255, 0.055) 0%,
+      transparent 35%,
+      transparent 65%,
+      rgba(0, 0, 0, 0.030) 100%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Sidebar bright top seam */
+[class*="sidebar_"]:not([class*="chat"]):not([class*="Sidebar"])::after,
+[class*="sidebar-"]:not([class*="chat"]):not([class*="Sidebar"])::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--rz-shine-rim) 25%,
+    rgba(255, 255, 255, 0.18) 75%,
+    transparent 100%);
+  pointer-events: none;
+  z-index: 11;
+}
+
+/* Channel items: rounded, micro-glass on hover */
+[class*="containerDefault_"],
+[class*="containerDefault-"],
+[class*="link_"][role="link"],
+[class*="link-"][role="link"] {
+  border-radius: var(--rz-radius-md) !important;
+  transition:
+    background-color var(--rz-anim-fast) var(--rz-ease-glass),
+    color           var(--rz-anim-fast) var(--rz-ease-glass),
+    box-shadow      var(--rz-anim-fast) var(--rz-ease-glass) !important;
+}
+
+[class*="containerDefault_"]:hover,
+[class*="containerDefault-"]:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.10) !important;
+}
+
+/* ================================================================
+   BOTTOM USER PANEL   — Frosted glass with top seam
+   Scoped to the canonical "User area" landmark so we never style any
+   other Discord element that happens to contain "panels" in its class.
+   ================================================================ */
+
+section[aria-label="User area"] {
+  background-color: rgba(8, 5, 22, 0.60) !important;
+  backdrop-filter: var(--rz-refract-soft) blur(var(--rz-blur-heavy)) saturate(var(--rz-glass-sat)) !important;
+  -webkit-backdrop-filter: var(--rz-refract-soft) blur(var(--rz-blur-heavy)) saturate(var(--rz-glass-sat)) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.13) !important;
+  box-shadow:
+    inset 0  1px 0 var(--rz-shine-top),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+    0 -6px 24px rgba(0, 0, 0, 0.28) !important;
+  position: relative;
+  isolation: isolate;
+}
+
+section[aria-label="User area"]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 80% at 0%   50%, var(--rz-ca-red)  0%, transparent 45%),
+    radial-gradient(ellipse 60% 80% at 100% 50%, var(--rz-ca-blue) 0%, transparent 45%),
+    linear-gradient(90deg,
+      rgba(255, 255, 255, 0.04) 0%,
+      transparent 35%,
+      transparent 65%,
+      rgba(255, 255, 255, 0.04) 100%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Bright top-edge seam where the panel meets the channel list */
+section[aria-label="User area"]::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 8px;
+  right: 8px;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--rz-shine-rim) 50%,
+    transparent 100%);
+  pointer-events: none;
+  z-index: 11;
+}
+
+/* ================================================================
+   MEMBER LIST   — Semi-frosted
+   ================================================================ */
+
+[class*="members_"],
+[class*="members-"],
+[class*="membersWrap_"],
+[class*="membersWrap-"] {
+  background-color: rgba(10, 7, 28, 0.42) !important;
+  backdrop-filter: var(--rz-refract-soft) blur(var(--rz-blur-medium)) saturate(160%) !important;
+  -webkit-backdrop-filter: var(--rz-refract-soft) blur(var(--rz-blur-medium)) saturate(160%) !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow:
+    inset  1px 0 0 0 rgba(255, 255, 255, 0.08),
+    inset  0  1px 0 0 rgba(255, 255, 255, 0.10) !important;
+  position: relative;
+}
+
+/* ================================================================
+   CHAT AREA   — Clear / non-frosted glass (the "windowpane")
+   ================================================================ */
+
+[class*="chat_"]:not([class*="Header"]):not([class*="ContentChat"]) {
+  backdrop-filter: var(--rz-refract-soft) blur(var(--rz-blur-thin)) saturate(120%) !important;
+  -webkit-backdrop-filter: var(--rz-refract-soft) blur(var(--rz-blur-thin)) saturate(120%) !important;
+}
+
+/* ================================================================
+   CHAT TOOLBAR / HEADER   — Thin glass strip
+   ================================================================ */
+
+[class*="toolbar_"],
+[class*="toolbar-"],
+[class*="title_"][class*="Wrap"],
+[class*="title-"][class*="Wrap"] {
+  backdrop-filter: var(--rz-refract-soft) blur(var(--rz-blur-light)) saturate(140%) !important;
+  -webkit-backdrop-filter: var(--rz-refract-soft) blur(var(--rz-blur-light)) saturate(140%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18) !important;
+}
+
+/* ================================================================
+   MESSAGE INPUT   — Floating clear-glass card
+   ================================================================ */
+
+[class*="channelTextArea_"],
+[class*="channelTextArea-"] {
+  background: var(--rz-glass-clear) !important;
+  backdrop-filter: var(--rz-refract) blur(14px) saturate(150%) !important;
+  -webkit-backdrop-filter: var(--rz-refract) blur(14px) saturate(150%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  border-radius: var(--rz-radius-md) !important;
+  box-shadow:
+    inset 0  1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.12),
+    0 4px 16px rgba(0, 0, 0, 0.22),
+    0 1px 2px rgba(0, 0, 0, 0.18) !important;
+  transition: box-shadow var(--rz-anim-base) var(--rz-ease-glass) !important;
+}
+
+[class*="channelTextArea_"]:focus-within,
+[class*="channelTextArea-"]:focus-within {
+  box-shadow:
+    inset 0  1px 0 rgba(255, 255, 255, 0.20),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.10),
+    0 4px 20px rgba(0, 0, 0, 0.26),
+    0 0 0 1px rgba(168, 122, 255, 0.32),
+    0 0 16px rgba(130, 90, 248, 0.22) !important;
+}
+
+/* ================================================================
+   MODALS + USER POPOUTS   — Deep glass with rotating conic rim
+   ================================================================ */
+
+[class*="modal_"],
+[class*="modal-"],
+[class*="userPopout_"],
+[class*="userPopout-"],
+[class*="userProfile_"],
+[class*="userProfile-"] {
+  background: var(--rz-glass-deep) !important;
+  /* Refraction first, blur after — displacement on raw backdrop pixels
+     reads as lensing; blurring the displaced result smooths jaggies. */
+  backdrop-filter: var(--rz-refract) blur(var(--rz-blur-heavy)) saturate(180%) !important;
+  -webkit-backdrop-filter: var(--rz-refract) blur(var(--rz-blur-heavy)) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.13) !important;
+  border-radius: var(--rz-radius-xl) !important;
+  box-shadow:
+    inset 0  1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.16),
+    inset  1px 0 0 rgba(255, 255, 255, 0.10),
+    inset -1px 0 0 rgba(0, 0, 0, 0.10),
+    0 32px 80px rgba(0, 0, 0, 0.58),
+    0  8px 24px rgba(0, 0, 0, 0.32),
+    0 0 0 0.5px rgba(168, 122, 255, 0.22) !important;
+  overflow: hidden;
+  position: relative;
+  isolation: isolate;
+}
+
+/* Top half refraction sheen + opposing CA corners */
+[class*="modal_"]::before,
+[class*="modal-"]::before,
+[class*="userPopout_"]::before,
+[class*="userPopout-"]::before,
+[class*="userProfile_"]::before,
+[class*="userProfile-"]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 0%   0%,   var(--rz-ca-red)  0%, transparent 45%),
+    radial-gradient(ellipse 60% 50% at 100% 100%, var(--rz-ca-blue) 0%, transparent 45%),
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.075) 0%,
+      rgba(255, 255, 255, 0.02) 35%,
+      transparent 60%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 1;
+}
+
+/* Rotating conic rim — the "Apple liquid glass" specular catch */
+[class*="modal_"]::after,
+[class*="modal-"]::after,
+[class*="userPopout_"]::after,
+[class*="userPopout-"]::after,
+[class*="userProfile_"]::after,
+[class*="userProfile-"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: conic-gradient(from var(--rz-rim-angle) at 50% 50%,
+    var(--rz-rim-arc) 0deg,
+    transparent 40deg 140deg,
+    var(--rz-rim-arc) 180deg,
+    transparent 220deg 320deg,
+    var(--rz-rim-arc) 360deg);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+          mask-composite: exclude;
+  animation: rz-rim-rotate 14s linear infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ================================================================
+   CONTEXT MENU   — Crisp deep glass with conic rim
+   ================================================================ */
+
+[class*="menu_"][role="menu"],
+[class*="menu-"][role="menu"],
+[class*="contextMenu_"],
+[class*="contextMenu-"] {
+  background: rgba(10, 7, 28, 0.74) !important;
+  backdrop-filter: var(--rz-refract-soft) blur(var(--rz-blur-heavy)) saturate(185%) !important;
+  -webkit-backdrop-filter: var(--rz-refract-soft) blur(var(--rz-blur-heavy)) saturate(185%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: var(--rz-radius-xl) !important;
+  box-shadow:
+    inset 0  1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.16),
+    inset  1px 0 0 rgba(255, 255, 255, 0.10),
+    inset -1px 0 0 rgba(0, 0, 0, 0.10),
+    0 20px 60px rgba(0, 0, 0, 0.55),
+    0  6px 18px rgba(0, 0, 0, 0.35),
+    0 0 0 0.5px rgba(168, 122, 255, 0.22) !important;
+  overflow: hidden;
+  position: relative;
+  isolation: isolate;
+}
+
+[class*="menu_"][role="menu"]::before,
+[class*="menu-"][role="menu"]::before,
+[class*="contextMenu_"]::before,
+[class*="contextMenu-"]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 0%   0%,   var(--rz-ca-red)  0%, transparent 42%),
+    radial-gradient(ellipse 60% 50% at 100% 100%, var(--rz-ca-blue) 0%, transparent 42%),
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.02) 60%,
+      transparent 100%);
+  mix-blend-mode: screen;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+}
+
+[class*="menu_"][role="menu"]::after,
+[class*="menu-"][role="menu"]::after,
+[class*="contextMenu_"]::after,
+[class*="contextMenu-"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: conic-gradient(from var(--rz-rim-angle) at 50% 50%,
+    var(--rz-rim-arc) 0deg,
+    transparent 35deg 145deg,
+    var(--rz-rim-arc) 180deg,
+    transparent 215deg 325deg,
+    var(--rz-rim-arc) 360deg);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+          mask-composite: exclude;
+  animation: rz-rim-rotate 18s linear infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Context-menu items: subtle hover lift */
+[class*="menu_"] [class*="item_"],
+[class*="menu-"] [class*="item-"],
+[class*="contextMenu_"] [class*="item_"],
+[class*="contextMenu-"] [class*="item-"] {
+  border-radius: var(--rz-radius-sm) !important;
+  margin: 1px 4px !important;
+  transition: background-color var(--rz-anim-fast) var(--rz-ease-glass) !important;
+  position: relative;
+  z-index: 3;
+}
+
+/* ================================================================
+   EMOJI / STICKER / GIF PICKERS   — Frosted glass card
+   ================================================================ */
+
+[class*="emojiPicker_"],
+[class*="emojiPicker-"],
+[class*="stickerPicker_"],
+[class*="stickerPicker-"],
+[class*="gifPicker_"],
+[class*="gifPicker-"] {
+  backdrop-filter: var(--rz-refract) blur(var(--rz-blur-heavy)) saturate(170%) !important;
+  -webkit-backdrop-filter: var(--rz-refract) blur(var(--rz-blur-heavy)) saturate(170%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: var(--rz-radius-xl) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.14),
+    0 20px 56px rgba(0, 0, 0, 0.50),
+    0 0 0 0.5px rgba(168, 122, 255, 0.18) !important;
+  overflow: hidden;
+  position: relative;
+  isolation: isolate;
+}
+
+/* ================================================================
+   SETTINGS SIDEBAR / STANDARD VIEW   — Frosted
+   ================================================================ */
+
+[class*="standardSidebarView_"],
+[class*="standardSidebarView-"],
+[class*="sidebarRegion_"],
+[class*="sidebarRegion-"] {
+  backdrop-filter: var(--rz-refract-soft) blur(var(--rz-blur-light)) saturate(140%) !important;
+  -webkit-backdrop-filter: var(--rz-refract-soft) blur(var(--rz-blur-light)) saturate(140%) !important;
+}
+
+/* ================================================================
+   TOOLTIPS   — Tiny glass card
+   ================================================================ */
+
+[class*="tooltip_"][role="tooltip"],
+[class*="tooltip-"][role="tooltip"],
+[class*="tooltipContent_"],
+[class*="tooltipContent-"] {
+  backdrop-filter: var(--rz-refract-soft) blur(16px) saturate(170%) !important;
+  -webkit-backdrop-filter: var(--rz-refract-soft) blur(16px) saturate(170%) !important;
+  background: rgba(10, 7, 28, 0.78) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: var(--rz-radius-sm) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 8px 24px rgba(0, 0, 0, 0.44) !important;
+}
+
+/* ================================================================
+   EMBEDS + CODE BLOCKS   — Subtle clear-glass tint
+   ================================================================ */
+
+[class*="embedFull_"],
+[class*="embedFull-"] {
+  backdrop-filter: var(--rz-refract-soft) blur(8px) saturate(135%) !important;
+  -webkit-backdrop-filter: var(--rz-refract-soft) blur(8px) saturate(135%) !important;
+  border-radius: var(--rz-radius-md) !important;
+  box-shadow:
+    inset 0  1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.10),
+    0 2px 8px rgba(0, 0, 0, 0.18) !important;
+}
+
+[class*="markup_"] code,
+[class*="markup-"] code,
+[class*="markup_"] pre,
+[class*="markup-"] pre {
+  border-radius: var(--rz-radius-sm) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+}
+
+/* ================================================================
+   FOLDERS   — Glassy folder background
+   ================================================================ */
+
+[class*="folder_"],
+[class*="folder-"],
+[class*="expandedFolderBackground_"],
+[class*="expandedFolderBackground-"] {
+  border-radius: var(--rz-radius-lg) !important;
+}
+
+[class*="folder_"][class*="wrapper"]:hover,
+[class*="folder-"][class*="wrapper"]:hover {
+  backdrop-filter: var(--rz-refract-soft) blur(8px) saturate(150%) !important;
+  -webkit-backdrop-filter: var(--rz-refract-soft) blur(8px) saturate(150%) !important;
+}
+
+/* ================================================================
+   ╔═══════════════════════════════════════════════════════════╗
+   ║   BACKLIT-LED HOVER GLOW   — Animated server icon halo     ║
+   ║   Layers: blob bloom (::before) + outer ambient (::after)  ║
+   ║         + box-shadow ring cascade on the icon wrapper      ║
+   ╚═══════════════════════════════════════════════════════════╝
+   ================================================================ */
+
+/* listItem is the master gate: --rz-glow drives every visible glow value
+   in the keyframes below. Transitioning --rz-glow fades the entire effect
+   in and out smoothly, in BOTH directions, no matter what frame of the
+   loop is current — because the animation never starts/stops, only the
+   property that scales its output changes. */
+[class*="guilds_"]   [class*="listItem_"],
+[class*="guilds-"]   [class*="listItem-"],
+[class*="guilds_"]   [class*="listItem-"],
+[class*="guilds-"]   [class*="listItem_"] {
+  position: relative;
+  overflow: visible !important;
+  isolation: isolate;
+  --rz-glow: 0;
+  transition: --rz-glow var(--rz-anim-base) var(--rz-ease-glass);
+}
+
+/* SELECTED: persistent moderate glow (animation runs but at 0.4 intensity
+   the breathing is barely visible — looks like a static lit state). */
+[class*="guilds_"] [class*="listItem_"]:has([class*="selected"]),
+[class*="guilds-"] [class*="listItem-"]:has([class*="selected"]),
+[class*="guilds_"] [class*="listItem-"]:has([class*="selected"]),
+[class*="guilds-"] [class*="listItem_"]:has([class*="selected"]) {
+  --rz-glow: 0.4;
+}
+
+/* HOVER: full intensity. Declared after :has(selected) so a selected+hover
+   state correctly resolves to 1, not 0.4. */
+[class*="guilds_"] [class*="listItem_"]:hover,
+[class*="guilds-"] [class*="listItem-"]:hover,
+[class*="guilds_"] [class*="listItem-"]:hover,
+[class*="guilds-"] [class*="listItem_"]:hover {
+  --rz-glow: 1;
+}
+
+/* Inner glow blob — close, bright bloom. Animation always running; opacity
+   and scale come from the keyframe (gated by --rz-glow), so at rest the
+   element is invisible without needing a separate hover override. */
+[class*="guilds_"] [class*="listItem_"]::before,
+[class*="guilds-"] [class*="listItem-"]::before,
+[class*="guilds_"] [class*="listItem-"]::before,
+[class*="guilds-"] [class*="listItem_"]::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%,
+    rgba(190, 150, 255, 0.95) 0%,
+    rgba(130,  90, 248, 0.72) 28%,
+    rgba( 81,  67, 200, 0.42) 58%,
+    transparent 80%);
+  pointer-events: none;
+  z-index: -1;
+  mix-blend-mode: screen;
+  animation: rz-led-breathe-inner 2.4s ease-in-out infinite;
+  animation-play-state: paused;
+}
+
+/* Outer ambient bloom — pronounced HEARTBEAT pulse, wider/softer */
+[class*="guilds_"] [class*="listItem_"]::after,
+[class*="guilds-"] [class*="listItem-"]::after,
+[class*="guilds_"] [class*="listItem-"]::after,
+[class*="guilds-"] [class*="listItem_"]::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%,
+    transparent 22%,
+    rgba(100,  72, 220, 0.40) 45%,
+    rgba( 81,  67, 181, 0.20) 65%,
+    transparent 86%);
+  pointer-events: none;
+  z-index: -1;
+  mix-blend-mode: screen;
+  animation: rz-led-breathe-outer 2.4s ease-in-out infinite;
+  animation-play-state: paused;
+}
+
+/* Icon wrapper carries the contoured drop-shadow halo. Animation runs
+   continuously; drop-shadow alphas in the keyframe are scaled by --rz-glow
+   so they're fully transparent at rest (--rz-glow: 0). drop-shadow follows
+   the actual rendered alpha mask, so the halo contours the rounded-square
+   icon shape on idle and the circle shape on hover. */
+[class*="guilds_"] [class*="listItem_"] [class*="wrapper_"],
+[class*="guilds-"] [class*="listItem-"] [class*="wrapper-"],
+[class*="guilds_"] [class*="listItem-"] [class*="wrapper_"],
+[class*="guilds-"] [class*="listItem_"] [class*="wrapper-"] {
+  position: relative;
+  z-index: 1;
+  animation: rz-led-pulse 2.4s ease-in-out infinite;
+  animation-play-state: paused;
+}
+
+/* PERF — Run breathing animations only while hovered. animation-play-state
+   is enum (not transitionable) but the smooth fade still works because all
+   keyframe outputs scale through --rz-glow, which IS transitioned. On
+   un-hover, the animation pauses at its current frame and --rz-glow fades
+   to 0 — the paused frame fades to invisible. On re-hover, the animation
+   resumes from where it stopped. Saves dozens of keyframe re-evaluations
+   per frame across all server icons at idle.
+
+   Selected (non-hovered) channels stay paused; --rz-glow: 0.4 plus the
+   paused frame-0 keyframe values produces a static moderate glow — the
+   active server reads as "lit" without continuously pulsing. */
+[class*="guilds_"] [class*="listItem_"]:hover::before,
+[class*="guilds-"] [class*="listItem-"]:hover::before,
+[class*="guilds_"] [class*="listItem-"]:hover::before,
+[class*="guilds-"] [class*="listItem_"]:hover::before,
+[class*="guilds_"] [class*="listItem_"]:hover::after,
+[class*="guilds-"] [class*="listItem-"]:hover::after,
+[class*="guilds_"] [class*="listItem-"]:hover::after,
+[class*="guilds-"] [class*="listItem_"]:hover::after,
+[class*="guilds_"] [class*="listItem_"]:hover [class*="wrapper_"],
+[class*="guilds-"] [class*="listItem-"]:hover [class*="wrapper-"],
+[class*="guilds_"] [class*="listItem-"]:hover [class*="wrapper_"],
+[class*="guilds-"] [class*="listItem_"]:hover [class*="wrapper-"] {
+  animation-play-state: running;
+}
+
+/* ================================================================
+   FRIENDS LIST + ACTIVE NOW COLUMN   — Glass cards
+   ================================================================ */
+
+/* Friend row — soft glass card on hover */
+[class*="peopleListItem_"] {
+  border-radius: var(--rz-radius-md) !important;
+  margin: 1px 8px !important;
+  transition:
+    background-color var(--rz-anim-fast) var(--rz-ease-glass),
+    box-shadow      var(--rz-anim-fast) var(--rz-ease-glass),
+    backdrop-filter var(--rz-anim-fast) var(--rz-ease-glass) !important;
+}
+
+[class*="peopleListItem_"]:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: var(--rz-refract-soft) blur(10px) saturate(140%) !important;
+  -webkit-backdrop-filter: var(--rz-refract-soft) blur(10px) saturate(140%) !important;
+  box-shadow:
+    inset 0  1px 0 rgba(255, 255, 255, 0.10),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.10) !important;
+}
+
+/* Action buttons (Message, More, etc.) — circular glass pills */
+[class*="actionButton_"] {
+  background: rgba(255, 255, 255, 0.06) !important;
+  backdrop-filter: var(--rz-refract-soft) blur(10px) saturate(150%) !important;
+  -webkit-backdrop-filter: var(--rz-refract-soft) blur(10px) saturate(150%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  border-radius: 50% !important;
+  box-shadow:
+    inset 0  1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.10),
+    0 2px 6px rgba(0, 0, 0, 0.20) !important;
+  transition:
+    background-color var(--rz-anim-fast) var(--rz-ease-glass),
+    border-color    var(--rz-anim-fast) var(--rz-ease-glass),
+    box-shadow      var(--rz-anim-fast) var(--rz-ease-glass),
+    transform       var(--rz-anim-fast) var(--rz-ease-spring) !important;
+}
+
+[class*="actionButton_"]:hover {
+  background: rgba(168, 122, 255, 0.22) !important;
+  border-color: rgba(168, 122, 255, 0.36) !important;
+  box-shadow:
+    inset 0  1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.10),
+    0 4px 12px rgba(81, 67, 181, 0.34),
+    0 0 18px rgba(168, 122, 255, 0.32) !important;
+  transform: translateY(-1px);
+}
+
+[class*="actionButton_"]:active {
+  transform: translateY(0) scale(0.95);
+}
+
+/* Active Now column container */
+[class*="nowPlayingColumn_"] {
+  background: rgba(10, 7, 28, 0.34) !important;
+  backdrop-filter: var(--rz-refract) blur(var(--rz-blur-medium)) saturate(150%) !important;
+  -webkit-backdrop-filter: var(--rz-refract) blur(var(--rz-blur-medium)) saturate(150%) !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
+  position: relative;
+}
+
+/* Empty-state cards + active-friend cards inside Active Now */
+[class*="emptyCard_"],
+[class*="itemCard_"] {
+  background: rgba(255, 255, 255, 0.04) !important;
+  backdrop-filter: var(--rz-refract) blur(14px) saturate(150%) !important;
+  -webkit-backdrop-filter: var(--rz-refract) blur(14px) saturate(150%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: var(--rz-radius-lg) !important;
+  box-shadow:
+    inset 0  1px 0 rgba(255, 255, 255, 0.10),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.10),
+    0 4px 16px rgba(0, 0, 0, 0.20) !important;
+  transition:
+    box-shadow var(--rz-anim-base) var(--rz-ease-glass),
+    transform  var(--rz-anim-base) var(--rz-ease-spring) !important;
+}
+
+[class*="itemCard_"]:hover {
+  box-shadow:
+    inset 0  1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.10),
+    0 6px 22px rgba(0, 0, 0, 0.28),
+    0 0 0 1px rgba(168, 122, 255, 0.22),
+    0 0 18px rgba(130, 90, 248, 0.18) !important;
+  transform: translateY(-1px);
+}
+
+/* ================================================================
+   SCROLLBAR   — Slim glass accent
+   ================================================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(81, 67, 181, 0.40);
+  border-radius: 4px;
+  box-shadow: 0 0 6px rgba(81, 67, 181, 0.32);
+  transition: background-color var(--rz-anim-fast) var(--rz-ease-glass);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(168, 122, 255, 0.65);
+  box-shadow: 0 0 10px rgba(168, 122, 255, 0.50);
+}
+
+/* Slim track in guild + sidebar regions */
+[class*="guilds_"]   ::-webkit-scrollbar,
+[class*="guilds-"]   ::-webkit-scrollbar,
+[class*="sidebar_"]  ::-webkit-scrollbar,
+[class*="sidebar-"]  ::-webkit-scrollbar {
+  width: 3px;
+}
+
+/* ================================================================
+   BUTTONS — Micro-glass on hover
+   ================================================================ */
+
+button[class*="button_"]:not([class*="primary"]):hover,
+button[class*="button-"]:not([class*="primary"]):hover {
+  backdrop-filter: blur(6px) saturate(140%);
+  -webkit-backdrop-filter: blur(6px) saturate(140%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.10),
+    0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+/* Primary action buttons — keep purple, add glass sheen */
+button[class*="button_"][class*="primary"],
+button[class*="button-"][class*="primary"] {
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    inset 0  1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.20),
+    0 4px 14px rgba(81, 67, 181, 0.40) !important;
+  transition:
+    transform var(--rz-anim-fast) var(--rz-ease-spring),
+    box-shadow var(--rz-anim-base) var(--rz-ease-glass) !important;
+}
+button[class*="button_"][class*="primary"]:hover,
+button[class*="button-"][class*="primary"]:hover {
+  box-shadow:
+    inset 0  1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+    0 6px 20px rgba(168, 122, 255, 0.55),
+    0 0 28px rgba(130, 90, 248, 0.32) !important;
+  transform: translateY(-1px);
+}
+button[class*="button_"][class*="primary"]:active,
+button[class*="button-"][class*="primary"]:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* ================================================================
+   SEARCH POPOUT / RESULTS   — Deep glass
+   ================================================================ */
+
+[class*="searchResultsWrap_"],
+[class*="searchResultsWrap-"],
+[class*="queryResults_"],
+[class*="queryResults-"] {
+  backdrop-filter: var(--rz-refract) blur(var(--rz-blur-heavy)) saturate(175%) !important;
+  -webkit-backdrop-filter: var(--rz-refract) blur(var(--rz-blur-heavy)) saturate(175%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.11) !important;
+  border-radius: var(--rz-radius-xl) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 20px 50px rgba(0, 0, 0, 0.48) !important;
+}
+
+/* ================================================================
+   REDUCED MOTION   — Respect user preference (a11y, WCAG 2.3.3)
+   ================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  /* Kill ambient looping rim rotations on glass surfaces */
+  [class*="modal_"]::after,
+  [class*="modal-"]::after,
+  [class*="userPopout_"]::after,
+  [class*="userPopout-"]::after,
+  [class*="userProfile_"]::after,
+  [class*="userProfile-"]::after,
+  [class*="menu_"][role="menu"]::after,
+  [class*="menu-"][role="menu"]::after,
+  [class*="contextMenu_"]::after,
+  [class*="contextMenu-"]::after {
+    animation: none !important;
+  }
+
+  /* Server-icon glow: kill the breathing animations and substitute static
+     filter/transform/opacity that still respond to --rz-glow, so hover and
+     selected states still light up — just without the pulse. Values are
+     roughly the midpoint of each animation's two keyframes. */
+  [class*="guilds_"] [class*="listItem_"]::before,
+  [class*="guilds-"] [class*="listItem-"]::before,
+  [class*="guilds_"] [class*="listItem-"]::before,
+  [class*="guilds-"] [class*="listItem_"]::before {
+    animation: none !important;
+    transform: translate(-50%, -50%) scale(calc(0.5 + 1.00 * var(--rz-glow)));
+    filter: blur(calc(14px + 5px * var(--rz-glow)));
+    opacity: var(--rz-glow);
+  }
+
+  [class*="guilds_"] [class*="listItem_"]::after,
+  [class*="guilds-"] [class*="listItem-"]::after,
+  [class*="guilds_"] [class*="listItem-"]::after,
+  [class*="guilds-"] [class*="listItem_"]::after {
+    animation: none !important;
+    transform: translate(-50%, -50%) scale(calc(0.4 + 1.55 * var(--rz-glow)));
+    filter: blur(calc(20px + 10px * var(--rz-glow)));
+    opacity: calc(0.75 * var(--rz-glow));
+  }
+
+  [class*="guilds_"] [class*="listItem_"] [class*="wrapper_"],
+  [class*="guilds-"] [class*="listItem-"] [class*="wrapper-"],
+  [class*="guilds_"] [class*="listItem-"] [class*="wrapper_"],
+  [class*="guilds-"] [class*="listItem_"] [class*="wrapper-"] {
+    animation: none !important;
+    filter:
+      brightness(calc(1 + 0.14 * var(--rz-glow)))
+      saturate(calc(1 + 0.22 * var(--rz-glow)))
+      drop-shadow(0 0  4px rgba(190, 150, 255, calc(0.95 * var(--rz-glow))))
+      drop-shadow(0 0 10px rgba(130,  90, 248, calc(0.72 * var(--rz-glow))))
+      drop-shadow(0 0 20px rgba( 81,  67, 200, calc(0.42 * var(--rz-glow))))
+      drop-shadow(0 0 34px rgba( 70,  55, 200, calc(0.16 * var(--rz-glow))));
+  }
+
+  /* Shorten transitions but keep --rz-glow's transition usable */
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
