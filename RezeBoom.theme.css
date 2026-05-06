@@ -262,14 +262,13 @@
   }
 }
 
-/* Drop-shadow pulse — traces the icon's actual rounded shape, not its box.
-   Drop-shadow alphas are scaled by --rz-glow so resting (--rz-glow: 0)
+/* Box-shadow pulse — alphas are scaled by --rz-glow so resting (--rz-glow: 0)
    produces fully transparent shadows (no glow). */
 @keyframes rz-led-pulse {
   0%, 100% {
     filter:
-      brightness(calc(1 + 0.10 * var(--rz-glow)))
-      saturate(calc(1 + 0.18 * var(--rz-glow)));
+      brightness(calc(1 + 0.05 * var(--rz-glow)))
+      saturate(calc(1 + 0.09 * var(--rz-glow)));
     box-shadow:
       0 0  3px rgba(190, 150, 255, calc(0.95 * var(--rz-glow))),
       0 0  8px rgba(130,  90, 248, calc(0.72 * var(--rz-glow))),
@@ -278,8 +277,8 @@
   }
   50% {
     filter:
-      brightness(calc(1 + 0.18 * var(--rz-glow)))
-      saturate(calc(1 + 0.28 * var(--rz-glow)));
+      brightness(calc(1 + 0.36 * var(--rz-glow)))
+      saturate(calc(1 + 0.56 * var(--rz-glow)));
     box-shadow:
       0 0  5px rgba(190, 150, 255, calc(0.95 * var(--rz-glow))),
       0 0 12px rgba(130,  90, 248, calc(0.72 * var(--rz-glow))),
@@ -871,7 +870,7 @@ section[aria-label="User area"]::after {
 :is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem-"]:has([class*="selected"]),
 :is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem-"]:has([class*="selected"]),
 :is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem_"]:has([class*="selected"]) {
-  --rz-glow: 0.4;
+  --rz-glow: 0.75;
 }
 
 /* HOVER: full intensity. Declared after :has(selected) so a selected+hover
@@ -939,13 +938,26 @@ section[aria-label="User area"]::after {
    the actual rendered alpha mask, so the halo contours the rounded-square
    icon shape on idle and the circle shape on hover. */
 :is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem_"] [class*="wrapper_"],
-:is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem-"] [class*="wrapper-"],
-:is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem-"] [class*="wrapper_"],
+:is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem-"][class*="wrapper-"],
+:is([class^="guilds_"],[class*=" guilds_"])[class*="listItem-"] [class*="wrapper_"],
 :is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem_"] [class*="wrapper-"] {
   position: relative;
   z-index: 1;
   animation: rz-led-pulse 2.4s ease-in-out infinite;
   animation-play-state: paused;
+  border-radius: 24px; 
+  transition: border-radius 0.2s ease-out;
+}
+
+:is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem_"]:hover [class*="wrapper_"],
+:is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem-"]:hover [class*="wrapper-"],
+:is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem-"]:hover [class*="wrapper_"],
+:is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem_"]:hover[class*="wrapper-"],
+:is([class^="guilds_"],[class*=" guilds_"])[class*="listItem_"]:has([class*="selected"]) [class*="wrapper_"],
+:is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem-"]:has([class*="selected"])[class*="wrapper-"],
+:is([class^="guilds_"],[class*=" guilds_"])[class*="listItem-"]:has([class*="selected"]) [class*="wrapper_"],
+:is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem_"]:has([class*="selected"]) [class*="wrapper-"] {
+  border-radius: 16px;
 }
 
 /* PERF — Run breathing animations only while hovered. animation-play-state
