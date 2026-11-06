@@ -35,10 +35,12 @@ Open `RezeBoom.theme.css` and edit the variables at the beginning of the `:root`
 | `--rz-liquid-rim`, `--rz-liquid-top` | Specular glass edges and bright top highlights. |
 | `--rz-liquid-focus` | Keyboard focus color on switches and controls. |
 | `--rz-liquid-speed` | Interaction duration (animations are reduced when the OS requests it). |
-| `--rz-chat-history-blur` | Chat-history-only backdrop blur (18px default; text remains sharp). |
-| `--rz-chat-history-tint` | Dark translucent color behind messages, keeping the wallpaper readable. |
+| `--rz-chat-history-blur` | Chat-only backdrop blur (6px default; reduced to preserve wallpaper detail). |
+| `--rz-chat-history-tint` | Dark translucent color behind messages (default alpha 0.32). |
 | `--rz-composer-tint` | Glass tint for the message composer capsule. |
 | `--rz-quest-card-tint` | Glass tint for the Quest bar above the user panel. |
+| `--rz-folder-glass-tint`, `--rz-folder-glass-blur` | Translucency and blur on server folder buttons and expanded folder backings. |
+| `--rz-icon-hover-glow` | Glow intensity on the icon art only, not unread or selection indicators. |
 
 To make local changes without losing them during updates, put **only** your variable overrides in Vencord **QuickCSS**, for example:
 
@@ -53,12 +55,15 @@ Use a directly accessible HTTPS image URL, not a web page URL. The theme renders
 
 ## Liquid-glass design
 
-Version **4.2.1** draws from the **Waterline** (liquid navbar) and **Surface Tension** (liquid toggle) React examples supplied by the user, credited in their headers to [guglielmogiannattasio.it](https://guglielmogiannattasio.it/). This theme adapts the **appearance** rather than copying their JavaScript or WebGL shader.
+Version **4.2.2** draws from the **Waterline** (liquid navbar) and **Surface Tension** (liquid toggle) React examples supplied by the user, credited in their headers to [guglielmogiannattasio.it](https://guglielmogiannattasio.it/). This theme adapts the **appearance** rather than copying their JavaScript or WebGL shader.
 
 - **Selected channels and DMs:** curved translucent pill selection, specular meniscus highlights, subtle spring-settle.
+- **Server folders and glyphs:** glass button/expanded folder backings; folder glyph, miniature previews, unread indicator and badge geometry are left to Discord.
+- **Server-icon glow:** restricted to actual icon artwork on hover, not the surrounding server list item or unread pill.
 - **Switches:** a glassy stateful track, white reflected rims, and a compressed knob on press (where Discord exposes a recognizable knob).
 - **Menus, popouts and modals:** layered caustics, violet/blue edge fringing and paused-at-rest optical rims.
-- **Chat history:** one blur layer on the chat-content pane, with a subtle dark overlay so text is readable over bright artwork.
+- **Chat history:** one restrained 6px blur layer on the chat-content pane, with an adjustable dark overlay so artwork is still recognizable.
+- **Additional UI:** scoped styling for search, settings cards, reactions, embeds, polls, member row hovers, and toolbar hover states.
 - **Message composer, Quest bar and small buttons:** translucent wet-glass reflections, preserved interactive controls, and a blurred background behind their surfaces.
 
 **Planned follow-up:** [Real-time Vencord liquid-glass userplugin design](docs/VENCORD_PLUGIN_PLAN.md) describes a separate WebGL/React enhancement, current technical limits, and the source-build installation requirement. **The plugin is planned, not implemented.**
@@ -71,10 +76,17 @@ Use Windows **Reduce Motion** if you prefer static effects. Forced-colors mode a
 
 - **No wallpaper:** Confirm the theme is enabled, reload Discord, and open the image URL in your browser. Remove any previous QuickCSS *background repair* snippet that might override the updated theme. If needed, set a different `--theme-background-image`.
 - **A surface is solid instead of glass:** Set Discord to a dark appearance; try disabling other themes / QuickCSS temporarily. Discord may have changed its internal layout.
-- **Chat is too dark/too clear:** Adjust `--rz-chat-history-tint` alpha (e.g. `0.3` for more wallpaper, `0.55` for easier text reading) and `--rz-chat-history-blur` (e.g. `12px`–`22px`).
+- **Chat is too dark/too clear:** Adjust `--rz-chat-history-tint` alpha (e.g. `0.22` for more wallpaper, `0.45` for easier text reading) and `--rz-chat-history-blur` (e.g. `3px`–`10px`).
 - **Quest still looks opaque:** The current Quest bar uses `[data-testid="quest-bar-container"]` in observed Discord builds; future updates may change it. If it changes, submit a screenshot and DOM selector info rather than applying a global transparency override.
 - **Lag on older GPUs:** Reduce the `--rz-blur-*` variables or enable **Reduce Motion** in your OS accessibility settings.
+- **Folder icons misaligned or strange unread dots:** Disable any older QuickCSS server-glow/folder overrides and make sure only one copy of this theme is enabled. Version 4.2.2 no longer animates the server list item or its pseudo-elements.
 - **Theme does not update:** Remove and re-add the Online Theme URL, or download the latest CSS for local use.
+
+## Styling coverage and limits
+
+Theme styling is intentionally scoped instead of applying a global glass rule to every Discord element. Covered surface families include guild rail, folder buttons and expanded backings, sidebar, channel/DM selection, chat history, composer, search, toolbars, user panel, settings cards, member list hover, reactions, embeds, polls, Quest bar, menus, emoji/GIF pickers, popouts, profile sidebar, scrollbars and common action buttons. Discord's unread/selection pills, avatar geometry, role/status colors, content, video, and native controls should not be globally restyled.
+
+**Visual QA is still required** after Discord updates. Selector/class names and plugin-modified folder layouts can change, and CSS parse tests cannot prove that every possible Discord screen is glass. See the [QA matrix](docs/THEME_QA.md) for manual review.
 
 ## Design and compatibility
 
