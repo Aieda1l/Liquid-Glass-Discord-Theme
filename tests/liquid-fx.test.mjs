@@ -70,3 +70,71 @@ test('preview keeps live Discord untouched and maintains native control interact
     assert.match(preview, /IntersectionObserver/);
     assert.match(preview, /\.disconnect\(\)/);
 });
+
+// Surface Tension/Waterline behavior contracts: test first, before implementation.
+test('liquid motion keeps a delayed tail so a 44px switch travel stretches visibly', async () => {
+    const { makeLiquidMotion, retargetLiquidMotion, advanceLiquidMotion } = await import('../src/userplugins/liquidGlassFx/motion.ts');
+    let liquid = retargetLiquidMotion(makeLiquidMotion(0), 44);
+    for (let i = 0; i < 5; i++) liquid = advanceLiquidMotion(liquid, 1 / 60, 18, 15);
+    assert.ok(Math.abs(liquid.head.x - liquid.tail.x) >= 20, `stretch=${liquid.head.x - liquid.tail.x}`);
+});
+
+test('long liquid travel pinches into small droplets, then remerges and stops animating', async () => {
+    const { makeLiquidMotion, retargetLiquidMotion, advanceLiquidMotion, liquidAtRest } = await import('../src/userplugins/liquidGlassFx/motion.ts');
+    let liquid = retargetLiquidMotion(makeLiquidMotion(0), 120);
+    let sawDrops = false;
+    let sawRipple = false;
+    for (let i = 0; i < 300; i++) {
+        liquid = advanceLiquidMotion(liquid, 1 / 60, 18, 19);
+        sawDrops ||= liquid.drops.length > 0;
+        sawRipple ||= liquid.ripples.length > 0;
+    }
+    assert.ok(sawDrops, 'travel should create pinched-off droplets');
+    assert.ok(sawRipple, 'settling should emit a short-lived ripple');
+    assert.equal(liquid.drops.length, 0);
+    assert.equal(liquid.ripples.length, 0);
+    assert.ok(liquidAtRest(liquid), 'no permanent animation loop at rest');
+});
+
+test('liquid motion reverses direction during motion without teleporting or stale droplets', async () => {
+    const { makeLiquidMotion, retargetLiquidMotion, advanceLiquidMotion, liquidAtRest } = await import('../src/userplugins/liquidGlassFx/motion.ts');
+    let liquid = retargetLiquidMotion(makeLiquidMotion(0), 160);
+    for (let i = 0; i < 6; i++) liquid = advanceLiquidMotion(liquid, 1 / 60, 16, 19);
+    const oldHead = liquid.head.x;
+    liquid = retargetLiquidMotion(liquid, 0);
+    assert.equal(liquid.head.x, oldHead);
+    for (let i = 0; i < 320; i++) liquid = advanceLiquidMotion(liquid, 1 / 60, 16, 19);
+    assert.ok(liquidAtRest(liquid));
+    assert.ok(Math.abs(liquid.head.x) < 0.02);
+});
+
+test('reduced motion eliminates stretch, droplets and ripples immediately', async () => {
+    const { makeLiquidMotion, retargetLiquidMotion, advanceLiquidMotion, liquidAtRest } = await import('../src/userplugins/liquidGlassFx/motion.ts');
+    let liquid = retargetLiquidMotion(makeLiquidMotion(10), 140);
+    liquid = advanceLiquidMotion(liquid, 1 / 60, 19, 16, true);
+    assert.equal(liquid.head.x, 140);
+    assert.equal(liquid.tail.x, 140);
+    assert.deepEqual(liquid.drops, []);
+    assert.deepEqual(liquid.ripples, []);
+    assert.ok(liquidAtRest(liquid));
+});
+
+test('renderer uses two-lobed signed-distance bodies plus droplets, ripples and track fill', () => {
+    const source = readFileSync(new URL('../src/userplugins/liquidGlassFx/rendering.ts', import.meta.url), 'utf8');
+    assert.match(source, /uniform\s+float\s+uNavTail/);
+    assert.match(source, /uniform\s+float\s+uKnobTail/);
+    assert.match(source, /uniform\s+vec4\s+uDrops\[\d+\]/);
+    assert.match(source, /uniform\s+vec4\s+uRipples\[\d+\]/);
+    assert.match(source, /uniform\s+float\s+uFillX/);
+    assert.match(source, /float\s+smoothUnion\s*\(/);
+});
+
+test('switch supports pointer dragging without removing native click or keyboard semantics', () => {
+    const source = readFileSync(new URL('../src/userplugins/liquidGlassFx/LiquidPreview.tsx', import.meta.url), 'utf8');
+    assert.match(source, /onPointerDown=/);
+    assert.match(source, /onPointerMove=/);
+    assert.match(source, /onPointerUp=/);
+    assert.match(source, /setPointerCapture/);
+    assert.match(source, /onClick=/);
+    assert.match(source, /aria-checked=/);
+});

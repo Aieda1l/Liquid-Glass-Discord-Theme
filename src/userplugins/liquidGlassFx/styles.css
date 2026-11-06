@@ -21,3 +21,5 @@
 @media (max-width: 470px) { .lgfx-nav { left: 3%; width: 94%; } .lgfx-nav-item { font-size: 11px; } }
 @media (prefers-reduced-motion: reduce) { .lgfx-nav-item, .lgfx-switch-knob { transition: none; } }
 @media (forced-colors: active) { .lgfx-nav, .lgfx-switch, .lgfx-nav-item[data-active="true"] { outline: 1px solid CanvasText; } }
+/* Horizontal drag is owned by the switch, not by the surrounding Discord dialog. */
+.lgfx-switch { touch-action: pan-y; -webkit-tap-highlight-color: transparent; }
