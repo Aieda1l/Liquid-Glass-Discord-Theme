@@ -1,19 +1,22 @@
 /* LiquidGlassFx experimental settings preview; no patches to Discord's live UI. */
 import { React } from "@webpack/common";
-import type { MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from "react";
+import type { PointerEvent as ReactPointerEvent } from "react";
 
 import {
     advanceLiquidMotion, liquidAtRest, makeLiquidMotion, makeSpring,
     retargetLiquidMotion, springAtRest, stepSpring
 } from "./motion";
 import { createGlassRenderer, type GlassRenderer, type Rect } from "./rendering";
+import { rectInCanvasSpace, xInCanvasSpace } from "./coordinates";
 
 const LABELS = ["Home", "Discover", "Messages", "Profile"] as const;
 const SPACING = 15;
 
-function relativeRect(element: HTMLElement, origin: DOMRect): Rect {
-    const rect = element.getBoundingClientRect();
-    return { x: rect.left - origin.left, y: rect.top - origin.top, width: rect.width, height: rect.height };
+function relativeRect(element: HTMLElement, canvas: HTMLCanvasElement): Rect {
+    // Layout measurements returned by DOMRect include zoom; WebGL canvas pixels do not.
+    return rectInCanvasSpace(element.getBoundingClientRect(), canvas.getBoundingClientRect(), {
+        width: canvas.clientWidth, height: canvas.clientHeight
+    });
 }
 
 export function LiquidPreview() {
@@ -52,23 +55,23 @@ export function LiquidPreview() {
     // All pointer positions are clamped to the knob travel inside the existing native button.
     const switchRange = () => {
         const toggle = toggleRef.current;
-        const stage = stageRef.current;
-        if (!toggle || !stage) return null;
-        const rect = relativeRect(toggle, stage.getBoundingClientRect());
+        const canvas = canvasRef.current;
+        if (!toggle || !canvas) return null;
+        const rect = relativeRect(toggle, canvas);
         return {
             left: rect.x + rect.height / 2 + 3,
             right: rect.x + rect.width - rect.height / 2 - 3,
-            stageLeft: stage.getBoundingClientRect().left
+            canvasBounds: canvas.getBoundingClientRect(),
+            cssWidth: canvas.clientWidth
         };
     };
     const switchPosition = (clientX: number) => {
         const range = switchRange();
         if (!range) return null;
-        return Math.max(range.left, Math.min(range.right, clientX - range.stageLeft));
+        return Math.max(range.left, Math.min(range.right, xInCanvasSpace(clientX, range.canvasBounds, range.cssWidth)));
     };
     const onPointerDown = (event: ReactPointerEvent<HTMLButtonElement>) => {
         if (event.pointerType === "mouse" && event.button !== 0) return;
-        event.stopPropagation();
         const x = switchPosition(event.clientX);
         if (x === null) return;
         dragRef.current = { id: event.pointerId, startX: event.clientX, x, moved: false, swallowClick: false };
@@ -84,7 +87,6 @@ export function LiquidPreview() {
         if (!drag.moved) {
             try { event.currentTarget.setPointerCapture(event.pointerId); } catch { /* capture is optional */ }
         }
-        event.stopPropagation();
         drag.moved = true;
         drag.swallowClick = true;
         drag.x = x;
@@ -94,7 +96,6 @@ export function LiquidPreview() {
     const onPointerUp = (event: ReactPointerEvent<HTMLButtonElement>) => {
         const drag = dragRef.current;
         if (drag.id !== event.pointerId) return;
-        event.stopPropagation();
         const range = switchRange();
         if (drag.moved && range) {
             const x = switchPosition(event.clientX) ?? drag.x;
@@ -106,7 +107,6 @@ export function LiquidPreview() {
     };
     const onPointerCancel = (event: ReactPointerEvent<HTMLButtonElement>) => {
         if (dragRef.current.id !== event.pointerId) return;
-        event.stopPropagation();
         dragRef.current.id = -1;
         dragRef.current.swallowClick = true;
         dragXRef.current = null;
@@ -133,12 +133,11 @@ export function LiquidPreview() {
         const media = window.matchMedia("(prefers-reduced-motion: reduce)");
         let reduceMotion = media.matches;
         const layout = () => {
-            const stageRect = stage.getBoundingClientRect();
-            const navRect = relativeRect(nav, stageRect);
-            const switchRect = relativeRect(toggle, stageRect);
+            const navRect = relativeRect(nav, canvas);
+            const switchRect = relativeRect(toggle, canvas);
             const selected = itemRefs.current[activeRef.current];
             if (!selected) return null;
-            const selectedRect = relativeRect(selected, stageRect);
+            const selectedRect = relativeRect(selected, canvas);
             const switchLeft = switchRect.x + switchRect.height / 2 + 3;
             const switchRight = switchRect.x + switchRect.width - switchRect.height / 2 - 3;
             const end = dragXRef.current ?? (checkedRef.current ? switchRight : switchLeft);
@@ -204,8 +203,8 @@ export function LiquidPreview() {
         };
         const rescale = () => {
             if (!renderer || disposed) return;
-            const bounds = stage.getBoundingClientRect();
-            renderer.resize(bounds.width, bounds.height, window.devicePixelRatio || 1);
+            // Use canvas-local CSS pixels, never scaled getBoundingClientRect dimensions.
+            renderer.resize(canvas.clientWidth, canvas.clientHeight, window.devicePixelRatio || 1);
             previousTime = 0;
             wake();
         };
@@ -287,11 +286,7 @@ export function LiquidPreview() {
                         className="lgfx-switch"
                         aria-label="Surface tension preview"
                         aria-pressed={checked}
-                        onClick={(event: ReactMouseEvent<HTMLButtonElement>) => {
-                            // Keep a preview click out of Vencord’s host settings UI.
-                            event.stopPropagation();
-                            flip();
-                        }}
+                        onClick={flip}
                         onPointerDown={onPointerDown}
                         onPointerMove={onPointerMove}
                         onPointerUp={onPointerUp}

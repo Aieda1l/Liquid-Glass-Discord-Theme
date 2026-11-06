@@ -147,11 +147,40 @@ test('preview toggle does not opt into Discord or theme switch-state CSS', () =>
     assert.doesNotMatch(css, /#app-mount \.lgfx-root \.lgfx-stage \.lgfx-switch/, 'no global theme override is needed');
 });
 
-test('switch click is not pointer-captured before dragging and does not bubble to settings host', () => {
+test('switch only captures the pointer during a drag and retains native click handling', () => {
     const source = readFileSync(new URL('../src/userplugins/liquidGlassFx/LiquidPreview.tsx', import.meta.url), 'utf8');
     const down = source.split('const onPointerDown =')[1]?.split('const onPointerMove =')[0] ?? '';
     const move = source.split('const onPointerMove =')[1]?.split('const onPointerUp =')[0] ?? '';
     assert.doesNotMatch(down, /setPointerCapture/, 'normal clicks must not capture the pointer');
     assert.match(move, /setPointerCapture/, 'dragging should retain pointer capture');
-    assert.match(source, /event\.stopPropagation\(\)/, 'preview click must not activate host settings UI');
+    assert.match(source, /onClick=\{flip\}/, 'native button click handler is preserved');
+});
+
+
+test('zoomed DOM control geometry must be converted into unscaled canvas pixels', async () => {
+    const { rectInCanvasSpace, xInCanvasSpace } = await import('../src/userplugins/liquidGlassFx/coordinates.ts');
+    // Browser probe: CSS zoom 120%, canvas clientWidth=680 while its viewport width=816.
+    const canvasBounds = { left: 36, top: 24, width: 816, height: 300 };
+    const cssSize = { width: 680, height: 250 };
+    const buttonBounds = { left: 455, top: 114, width: 180, height: 60 };
+    const box = rectInCanvasSpace(buttonBounds, canvasBounds, cssSize);
+    assert.deepEqual(box, { x: (455 - 36) / 1.2, y: (114 - 24) / 1.2, width: 150, height: 50 });
+    const cssCenter = box.x + box.width / 2;
+    assert.ok(Math.abs((cssCenter * 1.2 + canvasBounds.left) - (buttonBounds.left + buttonBounds.width / 2)) < 0.001);
+    assert.equal(xInCanvasSpace(545, canvasBounds, cssSize.width), (545 - 36) / 1.2);
+});
+
+test('rendering and hit testing use canvas local dimensions, not zoomed stage bounds', () => {
+    const source = readFileSync(new URL('../src/userplugins/liquidGlassFx/LiquidPreview.tsx', import.meta.url), 'utf8');
+    assert.match(source, /renderer\.resize\(canvas\.clientWidth,\s*canvas\.clientHeight/);
+    assert.match(source, /rectInCanvasSpace\(/);
+    assert.match(source, /xInCanvasSpace\(/);
+    assert.doesNotMatch(source, /rect\.left\s*-\s*origin\.left/);
+});
+
+test('preview clicks are not artificially blocked from bubbling to the host', () => {
+    const source = readFileSync(new URL('../src/userplugins/liquidGlassFx/LiquidPreview.tsx', import.meta.url), 'utf8');
+    assert.doesNotMatch(source, /event\.stopPropagation\(\)/);
+    assert.match(source, /aria-pressed=\{checked\}/);
+    assert.match(source, /onPointerMove=\{onPointerMove\}/);
 });
