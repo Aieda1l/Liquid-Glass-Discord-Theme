@@ -138,3 +138,15 @@ test('switch supports pointer dragging without removing native click or keyboard
     assert.match(source, /onClick=/);
     assert.match(source, /aria-checked=/);
 });
+
+test('shader preview isolates its switch from the theme-wide role=switch glass paint', () => {
+    const css = readFileSync(new URL('../src/userplugins/liquidGlassFx/styles.css', import.meta.url), 'utf8');
+    const gpuRule = css.match(/#app-mount \.lgfx-root \.lgfx-stage \.lgfx-switch\s*\{([^}]+)\}/)?.[1] ?? '';
+    const highlightRule = css.match(/#app-mount \.lgfx-root \.lgfx-stage \.lgfx-switch::after\s*\{([^}]+)\}/)?.[1] ?? '';
+    const fallbackRule = css.match(/#app-mount \.lgfx-root \.lgfx-stage\[data-gpu="off"\] \.lgfx-switch\s*\{([^}]+)\}/)?.[1] ?? '';
+    assert.match(gpuRule, /background:\s*transparent\s*!important/);
+    assert.match(gpuRule, /border:\s*0\s*!important/);
+    assert.match(gpuRule, /box-shadow:\s*none\s*!important/);
+    assert.match(highlightRule, /content:\s*none\s*!important/);
+    assert.match(fallbackRule, /background:\s*rgba\([^;]+\)\s*!important/);
+});
