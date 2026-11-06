@@ -322,7 +322,7 @@ test("selected icon halo is visible without forcing animation off on hover", () 
     rule.selector.includes('svg[class*="svg_"]') &&
     rule.nodes.some(n => n.prop === "filter" && n.value.includes("drop-shadow")));
   assert.ok(selected, "selected server icon receives persistent purple halo");
-  assert.equal(selected.nodes.find(n => n.prop === "filter").important, undefined,
+  assert.ok(!selected.nodes.find(n => n.prop === "filter").important,
     "important filter would override the hover animation on selected icons");
 
   const frames = [];
