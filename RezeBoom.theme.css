@@ -1,7 +1,7 @@
 /**
  * @name Reze Boom — Liquid Glass
  * @author a1edail
- * @version 4.2.0
+ * @version 4.2.1
  * @description Wallpaper-backed liquid glass with refractive-looking rims, glossy controls, water-like selection and violet ambient light.
  * @source https://github.com/Aieda1l/Liquid-Glass-Discord-Theme
  * @updateUrl https://raw.githubusercontent.com/Aieda1l/Liquid-Glass-Discord-Theme/main/RezeBoom.theme.css
@@ -1789,5 +1789,143 @@ button[class*="button-"][class*="primary"]:active {
     box-shadow: none !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
+  }
+}
+
+/* ================================================================
+   CHAT HISTORY / COMPOSER / QUEST GLASS — 4.2.1
+   ================================================================
+   Discord's app-shell rule above intentionally cleared the chat panes.
+   This targeted override restores a readable, frosted history region.
+   Use one blur on the chatContent pane, not per-message/per-row filters;
+   blurring each message would be expensive and blur the text as well.
+   ================================================================ */
+
+:root {
+  --rz-chat-history-blur: 18px;
+  --rz-chat-history-tint: rgba(7, 5, 24, 0.43);
+  --rz-composer-tint: rgba(20, 15, 51, 0.35);
+  --rz-quest-card-tint: rgba(20, 15, 48, 0.39);
+}
+
+/* Windowpane for the scrolling message history. This intentionally wins
+   over the foundation's background:none and backdrop-filter:none rules. */
+#app-mount :is(
+  [class^="chatContent_"], [class*=" chatContent_"],
+  [class^="chatContent-"], [class*=" chatContent-"]
+) {
+  background:
+    radial-gradient(ellipse 110% 65% at 75% -15%, rgba(163, 141, 246, 0.075), transparent 65%),
+    linear-gradient(150deg, rgba(23, 17, 52, 0.08), rgba(6, 4, 19, 0.10)),
+    var(--rz-chat-history-tint) !important;
+  -webkit-backdrop-filter: blur(var(--rz-chat-history-blur)) saturate(125%) brightness(0.88) !important;
+  backdrop-filter: blur(var(--rz-chat-history-blur)) saturate(125%) brightness(0.88) !important;
+  box-shadow:
+    inset 1px 0 0 rgba(255, 255, 255, 0.065),
+    inset 0 1px 0 rgba(255, 255, 255, 0.045) !important;
+}
+
+/* Inner message scrollers must not paint opaque rectangles over that pane.
+   Their contents (messages, embeds, reactions) are intentionally unchanged. */
+#app-mount :is(
+  [class^="chatContent_"], [class*=" chatContent_"],
+  [class^="chatContent-"], [class*=" chatContent-"]
+) :is(
+  [class^="messagesWrapper_"], [class*=" messagesWrapper_"],
+  [class^="scrollerInner_"], [class*=" scrollerInner_"]
+) {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* Discord's composer has its own nested scrollableContainer/themedBackground
+   backgrounds. Clear those, then put the liquid finish on the actual
+   channelTextArea glass capsule. No overlay intercepts input events. */
+#app-mount :is(
+  [class^="chatContent_"], [class*=" chatContent_"],
+  [class^="chatContent-"], [class*=" chatContent-"]
+) :is([class*="form_"], [class*="form-"]) {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+#app-mount :is(
+  [class^="channelTextArea_"], [class*=" channelTextArea_"],
+  [class^="channelTextArea-"], [class*=" channelTextArea-"]
+) {
+  background:
+    radial-gradient(ellipse 80% 100% at 16% -48%, rgba(255, 255, 255, 0.18), transparent 72%),
+    linear-gradient(175deg, rgba(153, 132, 244, 0.10), rgba(14, 9, 39, 0.12)),
+    var(--rz-composer-tint) !important;
+  border: 1px solid rgba(238, 244, 255, 0.22) !important;
+  border-radius: var(--rz-radius-lg) !important;
+  -webkit-backdrop-filter: blur(17px) saturate(145%) !important;
+  backdrop-filter: blur(17px) saturate(145%) !important;
+  box-shadow:
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.30),
+    inset 0 -2px 6px rgba(114, 96, 222, 0.19),
+    0 7px 22px rgba(3, 1, 17, 0.27) !important;
+}
+
+#app-mount :is(
+  [class^="channelTextArea_"], [class*=" channelTextArea_"],
+  [class^="channelTextArea-"], [class*=" channelTextArea-"]
+) :is(
+  [class*="scrollableContainer_"], [class*="scrollableContainer-"],
+  [class*="themedBackground_"], [class*="themedBackground-"],
+  [class*="textArea_"], [class*="textArea-"],
+  [class*="inner_"], [class*="inner-"]
+) {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* The stable Quest bar test ID is present in current Discord desktop
+   builds; a scoped class fallback also covers some older sidebar layouts.
+   Buttons and progress indicators keep their functional native styling. */
+#app-mount [data-testid="quest-bar-container"],
+#app-mount :is([class*="sidebar_"], [class*="sidebar-"], [class*="privateChannels_"])
+  :is(
+    [class*="questBar_"], [class*="questBar-"],
+    [class*="questCard_"], [class*="questCard-"],
+    [class*="questPanel_"], [class*="questPanel-"],
+    [class*="questContainer_"], [class*="questContainer-"]
+  ) {
+  background:
+    radial-gradient(ellipse 110% 70% at 15% -25%, rgba(255, 255, 255, 0.18), transparent 70%),
+    linear-gradient(160deg, rgba(170, 147, 248, 0.095), rgba(14, 9, 40, 0.12)),
+    var(--rz-quest-card-tint) !important;
+  border: 1px solid rgba(231, 236, 255, 0.23) !important;
+  border-radius: var(--rz-radius-lg) !important;
+  -webkit-backdrop-filter: blur(17px) saturate(145%) !important;
+  backdrop-filter: blur(17px) saturate(145%) !important;
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.26),
+    inset 0 -2px 6px rgba(94, 78, 206, 0.15),
+    0 9px 24px rgba(3, 1, 18, 0.28) !important;
+}
+
+/* Remove only nested opaque shells, not the "Claim Reward" button,
+   its progress indicator or any content/artwork. */
+#app-mount [data-testid="quest-bar-container"] > :is(
+  [class*="wrapper_"], [class*="wrapper-"],
+  [class*="container_"], [class*="container-"],
+  [class*="content_"], [class*="content-"]
+),
+#app-mount [data-testid="quest-bar-container"] :is(
+  [class*="background_"], [class*="background-"],
+  [class*="postEnrollmentBackground_"], [class*="postEnrollmentBackground-"]
+) {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* If the platform has no backdrop-filter, use opacity rather than
+   sacrificing message legibility against a busy wallpaper. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root {
+    --rz-chat-history-tint: rgba(7, 5, 24, 0.88);
+    --rz-composer-tint: rgba(20, 15, 51, 0.86);
+    --rz-quest-card-tint: rgba(20, 15, 48, 0.90);
   }
 }
