@@ -133,3 +133,15 @@ The self-contained `src/userplugins/liquidGlassFx/` proof of concept now contain
 Focused Node tests exercise spring settling, target reversal, reduced motion, pixel-area caps and safety contracts; an isolated TypeScript check was also run. **Not yet verified:** Vencord source build, shader compilation on a real WebGL-capable GPU, actual rendered appearance, live Discord integration and interactive accessibility review in a real client. These must pass before the plugin can be called production-ready.
 
 The installation and scope of this stage are documented in [`src/userplugins/liquidGlassFx/README.md`](../src/userplugins/liquidGlassFx/README.md).
+
+## 9. Experimental Stage B server-channel overlay (November 2026)
+
+**Implementation status:** Opt-in prototype source available in draft PR; still requires testing against the user's installed Vencord/Discord client. The CSS theme remains unaffected.
+
+- Reuses Vencord's currently observed `TypingIndicator` channel-row injection pattern (`UNREAD_IMPORTANT:`) to add inert, React-owned markers to guild channel rows. A marker resolves its own native link element, without changing its handlers or geometry.
+- One live WebGL canvas lives in a plugin-owned, pointer-transparent fixed overlay bounded by the selected channel's scroll viewport. It draws original transparent light/specular effects from a two-body signed-distance shader. Native row backgrounds remain visible; arbitrary Discord pixels are **not** sampled or captured.
+- The live overlay uses the same zoom-safe DOM-to-canvas projection as Stage A. It responds to `CHANNEL_SELECT`, bounded scroll/resize observers and reduced-motion settings. The renderer stops its animation loop at rest, hides when its target isn't visible, and destroys GPU resources when disabled.
+- `enableLiquidNav` defaults to **false** and requires restart. No direct messages or native toggles are changed in this milestone; those are separate follow-ups.
+- **Tests:** geometry/intersection, shader safety, off-by-default settings, patch shape and lifecycle guards. A real Vencord build and GPU/Discord visual checks are still required for release.
+
+**Risk and rollback:** Discord can change its minified module pattern, generated channel-link classes or scroll hierarchy. If the marker fails to inject or can't resolve an anchor, the effect will not appear; the base CSS theme remains. Disable the option and restart if any regression appears.

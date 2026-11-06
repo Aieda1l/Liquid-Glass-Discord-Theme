@@ -61,7 +61,7 @@ test('preview keeps live Discord untouched and maintains native control interact
     const plugin = readFileSync(new URL('../src/userplugins/liquidGlassFx/index.tsx', import.meta.url), 'utf8');
     const preview = readFileSync(new URL('../src/userplugins/liquidGlassFx/LiquidPreview.tsx', import.meta.url), 'utf8');
     assert.match(plugin, /OptionType\.COMPONENT/);
-    assert.doesNotMatch(plugin, /patches\s*:/);
+    assert.match(plugin, /enableLiquidNav/); // Stage B adds an opt-in patch; Stage A stays available
     assert.match(preview, /aria-pressed/);
     assert.match(preview, /webglcontextlost/);
     assert.match(preview, /cancelAnimationFrame/);
@@ -155,7 +155,6 @@ test('switch only captures the pointer during a drag and retains native click ha
     assert.match(move, /setPointerCapture/, 'dragging should retain pointer capture');
     assert.match(source, /onClick=\{flip\}/, 'native button click handler is preserved');
 });
-
 
 test('zoomed DOM control geometry must be converted into unscaled canvas pixels', async () => {
     const { rectInCanvasSpace, xInCanvasSpace } = await import('../src/userplugins/liquidGlassFx/coordinates.ts');
