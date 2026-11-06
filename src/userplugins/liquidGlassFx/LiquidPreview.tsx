@@ -1,6 +1,6 @@
 /* LiquidGlassFx experimental settings preview; no patches to Discord's live UI. */
 import { React } from "@webpack/common";
-import type { PointerEvent as ReactPointerEvent } from "react";
+import type { MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from "react";
 
 import {
     advanceLiquidMotion, liquidAtRest, makeLiquidMotion, makeSpring,
@@ -68,10 +68,11 @@ export function LiquidPreview() {
     };
     const onPointerDown = (event: ReactPointerEvent<HTMLButtonElement>) => {
         if (event.pointerType === "mouse" && event.button !== 0) return;
+        event.stopPropagation();
         const x = switchPosition(event.clientX);
         if (x === null) return;
         dragRef.current = { id: event.pointerId, startX: event.clientX, x, moved: false, swallowClick: false };
-        try { event.currentTarget.setPointerCapture(event.pointerId); } catch { /* capture is optional */ }
+        // Ordinary taps must remain ordinary clicks: capture only after a real drag.
         wakeRef.current();
     };
     const onPointerMove = (event: ReactPointerEvent<HTMLButtonElement>) => {
@@ -80,6 +81,10 @@ export function LiquidPreview() {
         if (!drag.moved && Math.abs(event.clientX - drag.startX) < 4) return;
         const x = switchPosition(event.clientX);
         if (x === null) return;
+        if (!drag.moved) {
+            try { event.currentTarget.setPointerCapture(event.pointerId); } catch { /* capture is optional */ }
+        }
+        event.stopPropagation();
         drag.moved = true;
         drag.swallowClick = true;
         drag.x = x;
@@ -89,6 +94,7 @@ export function LiquidPreview() {
     const onPointerUp = (event: ReactPointerEvent<HTMLButtonElement>) => {
         const drag = dragRef.current;
         if (drag.id !== event.pointerId) return;
+        event.stopPropagation();
         const range = switchRange();
         if (drag.moved && range) {
             const x = switchPosition(event.clientX) ?? drag.x;
@@ -100,6 +106,7 @@ export function LiquidPreview() {
     };
     const onPointerCancel = (event: ReactPointerEvent<HTMLButtonElement>) => {
         if (dragRef.current.id !== event.pointerId) return;
+        event.stopPropagation();
         dragRef.current.id = -1;
         dragRef.current.swallowClick = true;
         dragXRef.current = null;
@@ -278,10 +285,13 @@ export function LiquidPreview() {
                         type="button"
                         ref={toggleRef}
                         className="lgfx-switch"
-                        role="switch"
                         aria-label="Surface tension preview"
-                        aria-checked={checked}
-                        onClick={flip}
+                        aria-pressed={checked}
+                        onClick={(event: ReactMouseEvent<HTMLButtonElement>) => {
+                            // Keep a preview click out of Vencord’s host settings UI.
+                            event.stopPropagation();
+                            flip();
+                        }}
                         onPointerDown={onPointerDown}
                         onPointerMove={onPointerMove}
                         onPointerUp={onPointerUp}
