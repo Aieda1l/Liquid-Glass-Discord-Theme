@@ -22,7 +22,7 @@ test("valid CSS syntax and substantive stylesheet", () => {
 test("correct and self-contained theme metadata", () => {
   assert.match(css, /@name Reze Boom — Liquid Glass/);
   assert.match(css, /@author a1edail/);
-  assert.match(css, /@version 4\.2\.2/);
+  assert.match(css, /@version 4\.2\.3/);
   assert.match(css, /@source https:\/\/github\.com\/Aieda1l\/Liquid-Glass-Discord-Theme/);
   assert.match(css, /@updateUrl https:\/\/raw\.githubusercontent\.com\/Aieda1l\/Liquid-Glass-Discord-Theme\/main\/RezeBoom\.theme\.css/);
   assert.doesNotMatch(css, /@invite\b/);
@@ -149,7 +149,7 @@ test("composer clears opaque nested surfaces while keeping editable content", ()
 
 test("quest bar has a stable selector, frost and scoped inner cleanup", () => {
   const bar = findRules('[data-testid="quest-bar-container"]').find(rule =>
-    rule.nodes.some(node => node.prop === "backdrop-filter" && node.value.includes("blur(17px)"))
+    rule.nodes.some(node => node.prop === "backdrop-filter" && node.value.includes("blur(14px)"))
   );
   assert.ok(bar);
   assert.ok(bar.nodes.some(node => node.prop === "background" && node.value.includes("--rz-quest-card-tint")));
@@ -224,4 +224,75 @@ test("guild decoration is motion safe", () => {
        rule.toString().includes("transition: none"))reduced=true;
   });
   assert.ok(reduced);
+});
+
+test("tooltips have exactly one glass frame, and nested content is undecorated", () => {
+  const tooltip = findRules('[role="tooltip"]').find(rule =>
+    rule.selector.includes('[class*="tooltip_"]') &&
+    rule.nodes.some(n => n.prop === "backdrop-filter" && n.value.includes("blur(12px)")));
+  assert.ok(tooltip, "tooltip shell should receive the blur and rim");
+  assert.doesNotMatch(tooltip.selector, /tooltipContent_/);
+  const inner = findRules("tooltipContent_").find(rule =>
+    rule.selector.includes('[role="tooltip"]') &&
+    rule.nodes.some(n => n.prop === "box-shadow" && n.value === "none"));
+  assert.ok(inner, "inner tooltip should not get a second rectangle");
+  for(const prop of ["background", "border", "outline", "box-shadow", "backdrop-filter", "-webkit-backdrop-filter"]){
+    assert.ok(inner.nodes.some(n => n.prop === prop && n.important), `missing tooltip inner reset ${prop}`);
+  }
+  const outer = [];
+  root.walkRules(rule => {
+    if(rule.selector.includes("tooltipContent_") &&
+      rule.nodes.some(n => n.prop === "border" && n.value !== "0")) outer.push(rule.selector);
+  });
+  assert.deepEqual(outer, [], "tooltip inner content must never receive its own border");
+});
+
+test("Quest receives one outer glass pane without nested quest card overlays", () => {
+  const roots = [];
+  root.walkRules(rule => {
+    if(rule.selector.trim() === '#app-mount [data-testid="quest-bar-container"]' &&
+      rule.nodes.some(n => n.prop === "backdrop-filter")) roots.push(rule);
+  });
+  assert.equal(roots.length, 1);
+  assert.match(css, /--rz-quest-card-tint: rgba\(17, 12, 42, 0\.88\)/);
+  assert.ok(roots[0].nodes.some(n => n.prop === "background" && n.value.includes("--rz-quest-card-tint")));
+  const clean=css.replace(/\/\*[\s\S]*?\*\//g,"");
+  assert.doesNotMatch(clean, /\[class\*="wrapper_"\]:has\(\[class\*="questProgressWrapper"\]\)/);
+  const old = findRules("questBar_").filter(rule => rule.nodes.some(n => n.prop === "backdrop-filter"));
+  assert.equal(old.length,0,"no blanket questBar_ fallback coating child nodes");
+});
+
+test("generic Discord buttons and dropdown arrow controls avoid double pills", () => {
+  const decorated = [];
+  root.walkRules(rule => {
+    if (rule.selector.includes('button[class*="button_"]') &&
+      rule.nodes.some(n => n.prop === "background-image" || n.prop === "border-radius")) decorated.push(rule);
+  });
+  for (const rule of decorated) {
+    assert.ok(rule.selector.includes("userPopout_") || rule.selector.includes("userProfile_") ||
+      rule.selector.includes("peopleList_"), `Unscoped button paint at ${rule.source.start.line}`);
+  }
+  const dropdown = findRules('button[aria-haspopup="menu"]').find(rule =>
+    rule.selector.includes('section[aria-label="User area"]') &&
+    rule.nodes.some(n => n.prop === "background" && n.value === "transparent"));
+  assert.ok(dropdown, "user panel menu buttons should not get their own glass capsules");
+  assert.ok(dropdown.nodes.some(n => n.prop === "box-shadow" && n.value === "none" && n.important));
+  const focus = findRules('button[aria-haspopup="menu"]').find(rule =>
+    rule.selector.includes(":focus-visible") &&
+    rule.nodes.some(n => n.prop === "outline" && n.value.includes("rz-liquid-focus")));
+  assert.ok(focus, "dropdowns retain keyboard focus indication");
+});
+
+test("Quest and tooltip fixes do not hide controls or change their geometry", () => {
+  const clean=css.replace(/\/\*[\s\S]*?\*\//g,"");
+  assert.doesNotMatch(clean, /\[data-testid="quest-bar-container"\] [^{}]*button[^{}]*\{[^{}]*display:\s*none/);
+  assert.doesNotMatch(clean, /\[role="tooltip"\][^{}]*\{[^{}]*visibility:\s*hidden/);
+  const dropdown = findRules('button[aria-haspopup="menu"]').find(rule =>
+    rule.selector.includes('section[aria-label="User area"]') &&
+    rule.nodes.some(n => n.prop === "background" && n.value === "transparent"));
+  for (const node of dropdown.nodes) {
+    if (node.type !== "decl") continue;
+    assert.ok(!["display", "pointer-events", "width", "height", "position", "transform", "overflow"].includes(node.prop),
+       `Dropdown must keep its interaction/geometry: ${node.prop}`);
+  }
 });

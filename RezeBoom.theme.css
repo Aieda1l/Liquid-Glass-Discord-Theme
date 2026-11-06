@@ -1,7 +1,7 @@
 /**
  * @name Reze Boom — Liquid Glass
  * @author a1edail
- * @version 4.2.2
+ * @version 4.2.3
  * @description Wallpaper-backed liquid glass with refractive-looking rims, glossy controls, water-like selection and violet ambient light.
  * @source https://github.com/Aieda1l/Liquid-Glass-Discord-Theme
  * @updateUrl https://raw.githubusercontent.com/Aieda1l/Liquid-Glass-Discord-Theme/main/RezeBoom.theme.css
@@ -658,18 +658,29 @@ section[aria-label="User area"]::after {
    TOOLTIPS   — Tiny glass card
    ================================================================ */
 
-[class*="tooltip_"][role="tooltip"],
-[class*="tooltip-"][role="tooltip"],
-[class*="tooltipContent_"],
-[class*="tooltipContent-"] {
-  backdrop-filter: blur(16px) saturate(170%) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(170%) !important;
-  background: rgba(10, 7, 28, 0.78) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+/* One glass shell only. The content within a tooltip must not have a
+   second border/background: that caused nested rectangles on guild hover
+   and on simple name tooltips such as "Ash". */
+:is([class*="tooltip_"], [class*="tooltip-"])[role="tooltip"] {
+  background:
+    radial-gradient(ellipse 110% 70% at 15% -20%, rgba(233, 225, 255, 0.12), transparent 75%),
+    rgba(12, 8, 32, 0.94) !important;
+  border: 1px solid rgba(223, 220, 255, 0.22) !important;
   border-radius: var(--rz-radius-sm) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    0 8px 24px rgba(0, 0, 0, 0.44) !important;
+  backdrop-filter: blur(12px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 9px 25px rgba(0, 0, 0, 0.38) !important;
+}
+
+[role="tooltip"] :is(
+  [class*="tooltipContent_"], [class*="tooltipContent-"]
+) {
+  background: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 /* ================================================================
@@ -808,7 +819,7 @@ section[aria-label="User area"]::after {
 }
 
 /* Action buttons (Message, More, etc.) — circular glass pills */
-[class*="actionButton_"] {
+#app-mount :is([class*="peopleList_"], [class*="userPopout_"], [class*="userProfile_"]) [class*="actionButton_"] {
   background: rgba(255, 255, 255, 0.06) !important;
   backdrop-filter: blur(10px) saturate(150%) !important;
   -webkit-backdrop-filter: blur(10px) saturate(150%) !important;
@@ -825,7 +836,7 @@ section[aria-label="User area"]::after {
     transform       var(--rz-anim-fast) var(--rz-ease-spring) !important;
 }
 
-[class*="actionButton_"]:hover {
+#app-mount :is([class*="peopleList_"], [class*="userPopout_"], [class*="userProfile_"]) [class*="actionButton_"]:hover {
   background: rgba(168, 122, 255, 0.22) !important;
   border-color: rgba(168, 122, 255, 0.36) !important;
   box-shadow:
@@ -836,7 +847,7 @@ section[aria-label="User area"]::after {
   transform: translateY(-1px);
 }
 
-[class*="actionButton_"]:active {
+#app-mount :is([class*="peopleList_"], [class*="userPopout_"], [class*="userProfile_"]) [class*="actionButton_"]:active {
   transform: translateY(0) scale(0.95);
 }
 
@@ -907,45 +918,12 @@ section[aria-label="User area"]::after {
 }
 
 /* ================================================================
-   BUTTONS — Micro-glass on hover
+   BUTTONS — preserve native behavior for small controls
+   ================================================================
+   Liquid optical decoration is intentionally applied only to full-size
+   action buttons below; generic Discord buttons also include chevrons,
+   voice dropdowns and icon-only actions which must not receive pills.
    ================================================================ */
-
-button[class*="button_"]:not([class*="primary"]):hover,
-button[class*="button-"]:not([class*="primary"]):hover {
-  backdrop-filter: blur(6px) saturate(140%);
-  -webkit-backdrop-filter: blur(6px) saturate(140%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.10),
-    0 2px 8px rgba(0, 0, 0, 0.18);
-}
-
-/* Primary action buttons — keep purple, add glass sheen */
-button[class*="button_"][class*="primary"],
-button[class*="button-"][class*="primary"] {
-  position: relative;
-  overflow: hidden;
-  box-shadow:
-    inset 0  1px 0 rgba(255, 255, 255, 0.22),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.20),
-    0 4px 14px rgba(81, 67, 181, 0.40) !important;
-  transition:
-    transform var(--rz-anim-fast) var(--rz-ease-spring),
-    box-shadow var(--rz-anim-base) var(--rz-ease-glass) !important;
-}
-button[class*="button_"][class*="primary"]:hover,
-button[class*="button-"][class*="primary"]:hover {
-  box-shadow:
-    inset 0  1px 0 rgba(255, 255, 255, 0.28),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
-    0 6px 20px rgba(168, 122, 255, 0.55),
-    0 0 28px rgba(130, 90, 248, 0.32) !important;
-  transform: translateY(-1px);
-}
-button[class*="button_"][class*="primary"]:active,
-button[class*="button-"][class*="primary"]:active {
-  transform: translateY(0) scale(0.98);
-}
 
 /* ================================================================
    SEARCH POPOUT / RESULTS   — Deep glass
@@ -1003,28 +981,9 @@ button[class*="button-"][class*="primary"]:active {
    QUEST BOXES
    ================================================================ */
 
-/* Target the main Quest wrapper */
-[class*="wrapper_"]:has([class*="questProgressWrapper"]),
-[class*="wrapper_"]:has([class*="questAcceptedHeader"]) {
-  background: var(--rz-glass-semi) !important;
-  backdrop-filter: blur(var(--rz-blur-medium)) saturate(160%) !important;
-  -webkit-backdrop-filter: blur(var(--rz-blur-medium)) saturate(160%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  border-radius: var(--rz-radius-lg) !important;
-  box-shadow:
-    inset 0  1px 0 rgba(255, 255, 255, 0.18),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.12),
-    0 8px 24px rgba(0, 0, 0, 0.30) !important;
-  overflow: hidden;
-}
-
-/* Force strip Discord's aggressive linear-gradient overlays inside quests */
-[class*="wrapper_"]:has([class*="questProgressWrapper"])[class*="contentWrapper_"],
-[class*="wrapper_"]:has([class*="questProgressWrapper"])[class*="content_"],
-[class*="wrapper_"]:has([class*="questProgressWrapper"])[class*="postEnrollmentBackground_"] {
-  background: transparent !important;
-  background-image: none !important;
-}
+/* Quest styling is applied to the single outer quest-bar container in
+   the scoped section below. Do not decorate nested wrapper_ elements:
+   overlapping frosted panels create ghosted labels and duplicate rims. */
 
 /* ================================================================
    SERVER ONBOARDING PROMPTS
@@ -1525,41 +1484,27 @@ button[class*="button-"][class*="primary"]:active {
   outline-offset: 3px !important;
 }
 
-/* Smaller controls: specular top edge and restrained depth, with no
-   full-time blur on every button. Primary button colors remain readable. */
-#app-mount :is(
-  button[class*="button_"],
-  button[class*="button-"],
-  [class*="actionButton_"],
-  [class*="actionButton-"]
-) {
-  border-radius: 999px;
+/* Glossy treatment belongs on full-size actions, not EVERY button.
+   The previous generic button[class*="button_"] rule was styling the
+   mic/headphone dropdown arrows as independent glass capsules. */
+#app-mount :is([class*="userPopout_"], [class*="userProfile_"], [class*="peopleList_"])
+  button:is([class*="button_"], [class*="button-"]):not([aria-haspopup="menu"]) {
   background-image:
-    radial-gradient(ellipse 95% 85% at 28% -30%, rgba(255, 255, 255, 0.30), transparent 74%),
-    linear-gradient(170deg, rgba(255, 255, 255, 0.10), transparent 43%, rgba(94, 87, 191, 0.13)) !important;
+    radial-gradient(ellipse 95% 85% at 28% -30%, rgba(255, 255, 255, 0.20), transparent 74%),
+    linear-gradient(170deg, rgba(255, 255, 255, 0.07), transparent 43%, rgba(94, 87, 191, 0.10)) !important;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    inset 0 -1px 3px rgba(40, 28, 105, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.17),
+    inset 0 -1px 3px rgba(40, 28, 105, 0.11),
     0 2px 7px rgba(1, 0, 14, 0.18) !important;
 }
-
-#app-mount :is(
-  button[class*="button_"],
-  button[class*="button-"],
-  [class*="actionButton_"],
-  [class*="actionButton-"]
-):hover {
+#app-mount :is([class*="userPopout_"], [class*="userProfile_"], [class*="peopleList_"])
+  button:is([class*="button_"], [class*="button-"]):not([aria-haspopup="menu"]):hover {
   box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.44),
-    inset 0 -2px 5px rgba(98, 85, 215, 0.17),
-    0 5px 15px rgba(30, 15, 95, 0.25),
-    0 0 0 1px rgba(230, 237, 255, 0.21) !important;
+    inset 0 1px 1px rgba(255, 255, 255, 0.30),
+    inset 0 -2px 5px rgba(98, 85, 215, 0.14),
+    0 5px 15px rgba(30, 15, 95, 0.20) !important;
 }
-
-#app-mount :is(
-  button[class*="button_"],
-  button[class*="button-"]
-):focus-visible {
+#app-mount button:focus-visible {
   outline: 2px solid var(--rz-liquid-focus) !important;
   outline-offset: 2px !important;
 }
@@ -1616,7 +1561,7 @@ button[class*="button-"][class*="primary"]:active {
   --rz-chat-history-blur: 6px;
   --rz-chat-history-tint: rgba(7, 5, 24, 0.32);
   --rz-composer-tint: rgba(20, 15, 51, 0.35);
-  --rz-quest-card-tint: rgba(20, 15, 48, 0.39);
+  --rz-quest-card-tint: rgba(17, 12, 42, 0.88);
 }
 
 /* Windowpane for the scrolling message history. This intentionally wins
@@ -1691,28 +1636,21 @@ button[class*="button-"][class*="primary"]:active {
   background-image: none !important;
 }
 
-/* The stable Quest bar test ID is present in current Discord desktop
-   builds; a scoped class fallback also covers some older sidebar layouts.
-   Buttons and progress indicators keep their functional native styling. */
-#app-mount [data-testid="quest-bar-container"],
-#app-mount :is([class*="sidebar_"], [class*="sidebar-"], [class*="privateChannels_"])
-  :is(
-    [class*="questBar_"], [class*="questBar-"],
-    [class*="questCard_"], [class*="questCard-"],
-    [class*="questPanel_"], [class*="questPanel-"],
-    [class*="questContainer_"], [class*="questContainer-"]
-  ) {
+/* Only the single outer Quest card gets glass. Earlier rules also
+   decorated descendant questBar_/questCard_ nodes, creating multiple
+   borders and letting sidebar text/dates show through a weak .39 tint. */
+#app-mount [data-testid="quest-bar-container"] {
   background:
-    radial-gradient(ellipse 110% 70% at 15% -25%, rgba(255, 255, 255, 0.18), transparent 70%),
-    linear-gradient(160deg, rgba(170, 147, 248, 0.095), rgba(14, 9, 40, 0.12)),
+    radial-gradient(ellipse 100% 68% at 16% -25%, rgba(255, 255, 255, 0.12), transparent 74%),
+    linear-gradient(165deg, rgba(105, 83, 181, 0.09), rgba(8, 6, 31, 0.11)),
     var(--rz-quest-card-tint) !important;
-  border: 1px solid rgba(231, 236, 255, 0.23) !important;
+  border: 1px solid rgba(228, 233, 255, 0.20) !important;
   border-radius: var(--rz-radius-lg) !important;
-  -webkit-backdrop-filter: blur(17px) saturate(145%) !important;
-  backdrop-filter: blur(17px) saturate(145%) !important;
+  backdrop-filter: blur(14px) saturate(135%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(135%) !important;
   box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.26),
-    inset 0 -2px 6px rgba(94, 78, 206, 0.15),
+    inset 0 1px 1px rgba(255, 255, 255, 0.23),
+    inset 0 -2px 6px rgba(94, 78, 206, 0.12),
     0 9px 24px rgba(3, 1, 18, 0.28) !important;
 }
 
@@ -1739,6 +1677,35 @@ button[class*="button-"][class*="primary"]:active {
     --rz-composer-tint: rgba(20, 15, 51, 0.86);
     --rz-quest-card-tint: rgba(20, 15, 48, 0.90);
   }
+}
+
+/* Button clusters: the chevron next to microphone/headphones is a
+   secondary action inside the same cluster, not its own glass pill. Keep
+   hover/focus hit targets intact while removing decorative borders.
+   Restrict to the user panel so ordinary menu/toolbar buttons still work. */
+#app-mount section[aria-label="User area"] :is(
+  button[aria-haspopup="menu"],
+  button[class*="dropdownButton_"],
+  button[class*="dropdownButton-"],
+  button:has(> [class*="caret_"]),
+  button:has(> [class*="chevron_"])
+) {
+  background: transparent !important;
+  background-image: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+#app-mount section[aria-label="User area"] :is(
+  button[aria-haspopup="menu"],
+  button[class*="dropdownButton_"],
+  button[class*="dropdownButton-"],
+  button:has(> [class*="caret_"]),
+  button:has(> [class*="chevron_"])
+):focus-visible {
+  outline: 2px solid var(--rz-liquid-focus) !important;
+  outline-offset: 2px !important;
 }
 
 /* ================================================================
