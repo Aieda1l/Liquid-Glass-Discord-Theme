@@ -22,7 +22,7 @@ test("valid CSS syntax and substantive stylesheet", () => {
 test("correct and self-contained theme metadata", () => {
   assert.match(css, /@name Reze Boom — Liquid Glass/);
   assert.match(css, /@author a1edail/);
-  assert.match(css, /@version 4\.2\.1/);
+  assert.match(css, /@version 4\.2\.2/);
   assert.match(css, /@source https:\/\/github\.com\/Aieda1l\/Liquid-Glass-Discord-Theme/);
   assert.match(css, /@updateUrl https:\/\/raw\.githubusercontent\.com\/Aieda1l\/Liquid-Glass-Discord-Theme\/main\/RezeBoom\.theme\.css/);
   assert.doesNotMatch(css, /@invite\b/);
@@ -130,7 +130,7 @@ test("chat history is frosted exactly at the content pane, not on message text",
   assert.ok(bg?.important);
   assert.match(bg.value, /rz-chat-history-tint/);
   assert.ok(pane.nodes.some(node => node.prop === "-webkit-backdrop-filter" && node.important));
-  assert.match(css, /--rz-chat-history-blur: 18px/);
+  assert.match(css, /--rz-chat-history-blur: 6px/);
 });
 
 test("composer clears opaque nested surfaces while keeping editable content", () => {
@@ -170,4 +170,58 @@ test("opacity fallback keeps chat and quest text legible without backdrop-filter
         str.includes("--rz-quest-card-tint: rgba(20, 15, 48, 0.90)")) found = true;
   });
   assert.ok(found);
+});
+
+
+test("chat blur is restrained and wallpaper remains visible", () => {
+  const rootDecl = [];
+  root.walkDecls("--rz-chat-history-blur", d => rootDecl.push(d.value));
+  assert.deepEqual(rootDecl, ["6px"]);
+  assert.match(css, /--rz-chat-history-tint: rgba\(7, 5, 24, 0\.32\)/);
+  const pane = findRules("chatContent_").find(rule =>
+    rule.selector.startsWith("#app-mount") &&
+    rule.nodes.some(d => d.prop === "backdrop-filter" && d.value.includes("--rz-chat-history-blur"))
+  );
+  assert.ok(pane);
+  assert.ok(pane.nodes.some(d => d.prop === "backdrop-filter" && d.value.includes("brightness(0.98)")));
+});
+
+test("server unread markers and generic wrappers are never glow targets", () => {
+  const clean = css.replace(/\/\*[\s\S]*?\*\//g, "");
+  assert.doesNotMatch(clean, /\[class\*="listItem[_-]"\]::(?:before|after)/);
+  assert.doesNotMatch(clean, /rz-led-breathe|rz-led-pulse|--rz-glow/);
+  assert.doesNotMatch(clean, /\[class\*="folder_"\]/);
+  assert.ok(findRules("blobContainer_").some(rule =>
+    rule.selector.includes("childWrapper_") && rule.nodes.some(n => n.prop === "box-shadow")
+  ));
+  assert.doesNotMatch(clean, /\[class\*="pill_"\][^{}]*\{[^{}]*box-shadow/);
+});
+
+test("folder glass does not change icon positions or preview content", () => {
+  const folder = findRules("folderButton_").find(rule => rule.nodes.some(n => n.prop === "backdrop-filter"));
+  assert.ok(folder);
+  assert.ok(folder.nodes.some(n => n.prop === "border" && n.important));
+  assert.ok(findRules("expandedFolderBackground_").some(rule => rule.nodes.some(n => n.prop === "backdrop-filter")));
+  const folderRules=[];
+  root.walkRules(r=>{if(r.selector.includes("folderButton_")||r.selector.includes("blobContainer_"))folderRules.push(r)});
+  const noGeometry=["width","height","margin-left","left","top","translate","transform","scale","overflow","z-index"];
+  for(const rule of folderRules)for(const n of rule.nodes)if(n.type==="decl"){
+    assert.ok(!noGeometry.includes(n.prop), `Must not alter guild geometry: ${n.prop} at ${n.source.start.line}`);
+  }
+});
+
+test("major auxiliary surfaces use scoped glass rather than global resets", () => {
+  for(const target of ["searchBarComponent_","contentRegion_","reaction_","pollContainer_","membersWrap_","toolbar_"]){
+    assert.ok(findRules(target).length>0, `Missing ${target}`);
+  }
+  assert.doesNotMatch(css, /#app-mount\s+\*\s*\{[^}]*background:/);
+});
+
+test("guild decoration is motion safe", () => {
+  let reduced=false;
+  root.walkAtRules("media", rule=>{
+    if(rule.params.includes("prefers-reduced-motion") && rule.toString().includes("folderButton_") &&
+       rule.toString().includes("transition: none"))reduced=true;
+  });
+  assert.ok(reduced);
 });
