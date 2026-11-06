@@ -718,7 +718,7 @@ section[aria-label="User area"]::after {
 :root {
   --rz-folder-glass-tint: rgba(29, 22, 66, 0.35);
   --rz-folder-glass-blur: 9px;
-  --rz-icon-hover-glow: rgba(155, 119, 255, 0.30);
+  --rz-icon-hover-glow: rgba(144, 91, 255, 0.78);
 }
 
 /* A dedicated folder button and the expanded folder backing are separate
@@ -778,7 +778,7 @@ section[aria-label="User area"]::after {
   50% {
     filter:
       drop-shadow(0 0 5px rgba(209, 179, 255, 0.96))
-      drop-shadow(0 0 14px rgba(144, 91, 255, 0.78))
+      drop-shadow(0 0 14px var(--rz-icon-hover-glow))
       drop-shadow(0 0 24px rgba(88, 60, 215, 0.46));
   }
 }
@@ -793,7 +793,7 @@ section[aria-label="User area"]::after {
   50% {
     box-shadow:
       0 0 7px rgba(209, 179, 255, 0.96),
-      0 0 18px rgba(144, 91, 255, 0.78),
+      0 0 18px var(--rz-icon-hover-glow),
       0 0 33px rgba(88, 60, 215, 0.44);
   }
 }
