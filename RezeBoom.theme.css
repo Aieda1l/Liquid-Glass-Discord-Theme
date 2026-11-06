@@ -816,7 +816,7 @@ section[aria-label="User area"]::after {
   filter:
     drop-shadow(0 0 3px rgba(190, 150, 255, 0.78))
     drop-shadow(0 0 10px rgba(130, 90, 248, 0.52))
-    drop-shadow(0 0 20px rgba(81, 67, 200, 0.32)) !important;
+    drop-shadow(0 0 20px rgba(81, 67, 200, 0.32));
 }
 
 /* Hover / keyboard focus: bright pulsing light on SVG icon artwork only. */
@@ -827,43 +827,44 @@ section[aria-label="User area"]::after {
 }
 
 /* Fallback for builds with no SVG icon host. Do not light BOTH the
-   fallback and SVG on the same server: that would double the halo. */
+   fallback and SVG on the same server: that would double the halo.
+   Prefer the childWrapper fallback to avoid doubling an image nested in it. */
 #app-mount :is([class*="guilds_"], [class*="guilds-"])
   [class*="blobContainer_"]:not(:has(svg[class*="svg_"], [class*="folderButton_"], [class*="folderButton-"], [class*="folderIcon_"], [class*="folderIcon-"]))
-  :is([class*="childWrapper_"], img[class*="icon_"]) {
+  [class*="childWrapper_"] {
   transition: box-shadow 240ms ease !important;
 }
 #app-mount :is([class*="guilds_"], [class*="guilds-"])
   [class*="blobContainer_"]:not(:has(svg[class*="svg_"], [class*="folderButton_"], [class*="folderButton-"], [class*="folderIcon_"], [class*="folderIcon-"])):has([class*="selected_"])
-  :is([class*="childWrapper_"], img[class*="icon_"]) {
+  [class*="childWrapper_"] {
   box-shadow:
     0 0 5px rgba(190, 150, 255, 0.72),
     0 0 13px rgba(130, 90, 248, 0.50),
-    0 0 24px rgba(81, 67, 200, 0.28) !important;
+    0 0 24px rgba(81, 67, 200, 0.28);
 }
 #app-mount :is([class*="guilds_"], [class*="guilds-"])
   [class*="blobContainer_"]:not(:has(svg[class*="svg_"], [class*="folderButton_"], [class*="folderButton-"], [class*="folderIcon_"], [class*="folderIcon-"])):is(:hover, :focus-within)
-  :is([class*="childWrapper_"], img[class*="icon_"]) {
+  [class*="childWrapper_"] {
   animation: rz-guild-fallback-halo 2.35s ease-in-out infinite !important;
 }
 
 /* Motion preference: retain a static ring without pulsing. */
 @media (prefers-reduced-motion: reduce) {
   #app-mount :is([class*="guilds_"], [class*="guilds-"])
-    [class*="blobContainer_"]:is(:hover, :focus-within)
-    :is(svg[class*="svg_"], [class*="childWrapper_"], img[class*="icon_"]) {
+    [class*="blobContainer_"]:not(:has([class*="folderButton_"], [class*="folderButton-"], [class*="folderIcon_"], [class*="folderIcon-"])):is(:hover, :focus-within)
+    :is(svg[class*="svg_"], [class*="childWrapper_"]) {
     animation: none !important;
     transition: none !important;
   }
   #app-mount :is([class*="guilds_"], [class*="guilds-"])
-    [class*="blobContainer_"]:is(:hover, :focus-within) svg[class*="svg_"] {
+    [class*="blobContainer_"]:not(:has([class*="folderButton_"], [class*="folderButton-"], [class*="folderIcon_"], [class*="folderIcon-"])):is(:hover, :focus-within) svg[class*="svg_"] {
     filter:
       drop-shadow(0 0 4px rgba(209, 179, 255, 0.92))
       drop-shadow(0 0 12px rgba(144, 91, 255, 0.68)) !important;
   }
   #app-mount :is([class*="guilds_"], [class*="guilds-"])
-    [class*="blobContainer_"]:not(:has(svg[class*="svg_"])):is(:hover, :focus-within)
-    :is([class*="childWrapper_"], img[class*="icon_"]) {
+    [class*="blobContainer_"]:not(:has(svg[class*="svg_"], [class*="folderButton_"], [class*="folderButton-"], [class*="folderIcon_"], [class*="folderIcon-"])):is(:hover, :focus-within)
+    [class*="childWrapper_"] {
     box-shadow:
       0 0 6px rgba(209, 179, 255, 0.87),
       0 0 18px rgba(144, 91, 255, 0.60) !important;
