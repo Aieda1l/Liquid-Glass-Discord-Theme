@@ -18,7 +18,7 @@ A recent Vencord checkout is needed because internal plugin APIs can change. A s
 - **Real shader work:** A WebGL 1 fragment shader refracts an independently generated wallpaper texture using normals from a signed-distance height field. The sample is moved in the GPU, not faked with CSS gradients.
 - **Current boundary:** This proves only the self-owned preview composition. It is *not yet* genuine refraction of pixels behind Discord elements, and no live navigation or settings toggles are patched.
 - **GPU fallback:** When WebGL is missing, fails compilation or loses its context, the preview remains clickable with a CSS glass approximation.
-- **Accessibility:** Buttons retain native keyboard activation; the toggle exposes `role="switch"` and `aria-checked`; focus is visible. The canvas has `aria-hidden` and does not intercept clicks.
+- **Accessibility:** Buttons retain native keyboard activation; the preview toggle exposes `aria-pressed` on a native button (instead of `role="switch"`, which triggers Discord/theme switch selectors); focus is visible. The canvas has `aria-hidden` and does not intercept clicks.
 - **Performance:** A single canvas/WebGL context is created per open preview. Texture resolution is capped, rendering pauses at rest or offscreen, and resources/listeners/observers are released on unmount. The OS reduced-motion setting snaps springs to their targets.
 - **Privacy:** No DOM text extraction, screen capture, remote wallpaper loads, telemetry, message access, `readPixels` or network requests.
 
