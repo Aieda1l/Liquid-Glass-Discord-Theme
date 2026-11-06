@@ -63,7 +63,6 @@ test('preview keeps live Discord untouched and maintains native control interact
     assert.match(plugin, /OptionType\.COMPONENT/);
     assert.doesNotMatch(plugin, /patches\s*:/);
     assert.match(preview, /aria-pressed/);
-    assert.match(preview, /aria-checked/);
     assert.match(preview, /webglcontextlost/);
     assert.match(preview, /cancelAnimationFrame/);
     assert.match(preview, /prefers-reduced-motion/);
@@ -136,17 +135,23 @@ test('switch supports pointer dragging without removing native click or keyboard
     assert.match(source, /onPointerUp=/);
     assert.match(source, /setPointerCapture/);
     assert.match(source, /onClick=/);
-    assert.match(source, /aria-checked=/);
+    assert.match(source, /aria-pressed=/);
 });
 
-test('shader preview isolates its switch from the theme-wide role=switch glass paint', () => {
+test('preview toggle does not opt into Discord or theme switch-state CSS', () => {
+    const preview = readFileSync(new URL('../src/userplugins/liquidGlassFx/LiquidPreview.tsx', import.meta.url), 'utf8');
     const css = readFileSync(new URL('../src/userplugins/liquidGlassFx/styles.css', import.meta.url), 'utf8');
-    const gpuRule = css.match(/#app-mount \.lgfx-root \.lgfx-stage \.lgfx-switch\s*\{([^}]+)\}/)?.[1] ?? '';
-    const highlightRule = css.match(/#app-mount \.lgfx-root \.lgfx-stage \.lgfx-switch::after\s*\{([^}]+)\}/)?.[1] ?? '';
-    const fallbackRule = css.match(/#app-mount \.lgfx-root \.lgfx-stage\[data-gpu="off"\] \.lgfx-switch\s*\{([^}]+)\}/)?.[1] ?? '';
-    assert.match(gpuRule, /background:\s*transparent\s*!important/);
-    assert.match(gpuRule, /border:\s*0\s*!important/);
-    assert.match(gpuRule, /box-shadow:\s*none\s*!important/);
-    assert.match(highlightRule, /content:\s*none\s*!important/);
-    assert.match(fallbackRule, /background:\s*rgba\([^;]+\)\s*!important/);
+    assert.match(preview, /aria-pressed=\{checked\}/, 'toggle button remains accessible to keyboard and assistive tech');
+    assert.doesNotMatch(preview, /role="switch"|aria-checked=/, 'preview should not match Discord theme switch selectors');
+    assert.match(css, /\.lgfx-switch\[aria-pressed="true"\] \.lgfx-switch-knob/, 'fallback tracks pressed state');
+    assert.doesNotMatch(css, /#app-mount \.lgfx-root \.lgfx-stage \.lgfx-switch/, 'no global theme override is needed');
+});
+
+test('switch click is not pointer-captured before dragging and does not bubble to settings host', () => {
+    const source = readFileSync(new URL('../src/userplugins/liquidGlassFx/LiquidPreview.tsx', import.meta.url), 'utf8');
+    const down = source.split('const onPointerDown =')[1]?.split('const onPointerMove =')[0] ?? '';
+    const move = source.split('const onPointerMove =')[1]?.split('const onPointerUp =')[0] ?? '';
+    assert.doesNotMatch(down, /setPointerCapture/, 'normal clicks must not capture the pointer');
+    assert.match(move, /setPointerCapture/, 'dragging should retain pointer capture');
+    assert.match(source, /event\.stopPropagation\(\)/, 'preview click must not activate host settings UI');
 });
