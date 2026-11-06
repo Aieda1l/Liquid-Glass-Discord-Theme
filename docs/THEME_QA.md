@@ -1,6 +1,6 @@
 # Reze Boom — Liquid Glass UI QA matrix
 
-Version: **4.2.2**. This is a manual verification checklist, not evidence that Discord was rendered or that all items passed. Use the latest Windows Discord/Vencord build with this theme alone, then repeat important checks with other plugins enabled.
+Version: **4.2.3**. This is a manual verification checklist, not evidence that Discord was rendered or that all items passed. Use the latest Windows Discord/Vencord build with this theme alone, then repeat important checks with other plugins enabled.
 
 ## Must-pass screenshot regressions
 
@@ -13,6 +13,10 @@ Version: **4.2.2**. This is a manual verification checklist, not evidence that D
 | Expanded folder | Frosted vertical backing, native open/close animation | Folder content clipped, blank background, overlay blocking clicks |
 | Server icon hover | Subtle light on actual avatar artwork only | White unread dot / selection indicator glowing, resizing or disappearing |
 | Unread/selected guild | White pill, red notification badge and normal hover behavior | Duplicate white dots, shifted marker or modified badges |
+| Server-name tooltip hover | One glass container with legible title/details | Duplicate rectangular outline or inset glass frame |
+| Small name tooltip (e.g. Ash) | Single tooltip outline, text fully readable | A second border around the label |
+| Quest card over the DM list | Readable date/title/action with glass tint blocking underlying text | Ghosted second date, DM/user text bleeding through, multiple borders |
+| User mic/headphone dropdowns | Native compact chevron hit target inside shared panel | Independent extra pill from global button styling |
 
 ## Broad UI surface checklist
 
@@ -30,6 +34,9 @@ Version: **4.2.2**. This is a manual verification checklist, not evidence that D
 ## Performance and selector safety
 
 - No extra pseudo-elements on guild `listItem_`, including `::before`/`::after`.
+- Tooltip glass must decorate the outer `[role="tooltip"]` once; inner `tooltipContent_` has no border or blur.
+- Quest glass must decorate the `[data-testid="quest-bar-container"]` once, with a sufficient opacity to obscure content behind it.
+- Avoid universal `button[class*="button_"]` background-image/box-shadow and preserve native dropdown controls.
 - No global animation/transform/filter on generic server `wrapper_` elements.
 - No generic `[class*="folder_"]` modifications; only dedicated folder surfaces.
 - No per-message backdrop filters; one shared `chatContent_` blur.
