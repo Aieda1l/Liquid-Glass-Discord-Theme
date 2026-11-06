@@ -22,7 +22,7 @@ test("valid CSS syntax and substantive stylesheet", () => {
 test("correct and self-contained theme metadata", () => {
   assert.match(css, /@name Reze Boom — Liquid Glass/);
   assert.match(css, /@author a1edail/);
-  assert.match(css, /@version 4\.2\.0/);
+  assert.match(css, /@version 4\.2\.1/);
   assert.match(css, /@source https:\/\/github\.com\/Aieda1l\/Liquid-Glass-Discord-Theme/);
   assert.match(css, /@updateUrl https:\/\/raw\.githubusercontent\.com\/Aieda1l\/Liquid-Glass-Discord-Theme\/main\/RezeBoom\.theme\.css/);
   assert.doesNotMatch(css, /@invite\b/);
@@ -116,4 +116,58 @@ test("CSS-only theme does not embed runtime scripts or shader canvases", () => {
   assert.doesNotMatch(css, /<script\b/i);
   assert.doesNotMatch(css, /@import[^;]*\.jsx?/i);
   assert.match(css, /The references implement their fluid surfaces with React \+ WebGL/);
+});
+
+
+test("chat history is frosted exactly at the content pane, not on message text", () => {
+  const rules = findRules("chatContent_").filter(rule =>
+    rule.selector.startsWith("#app-mount") &&
+    rule.nodes.some(node => node.prop === "backdrop-filter" && node.value.includes("--rz-chat-history-blur"))
+  );
+  assert.equal(rules.length, 1, "one shared blur pane rather than individual message blurs");
+  const pane = rules[0];
+  const bg = pane.nodes.find(node => node.prop === "background");
+  assert.ok(bg?.important);
+  assert.match(bg.value, /rz-chat-history-tint/);
+  assert.ok(pane.nodes.some(node => node.prop === "-webkit-backdrop-filter" && node.important));
+  assert.match(css, /--rz-chat-history-blur: 18px/);
+});
+
+test("composer clears opaque nested surfaces while keeping editable content", () => {
+  const nested = findRules("scrollableContainer_").find(rule =>
+    rule.selector.includes("channelTextArea_") &&
+    rule.nodes.some(node => node.prop === "background-image" && node.value === "none" && node.important)
+  );
+  assert.ok(nested, "nested scrollable composer background should be cleared");
+  const body = findRules("channelTextArea_").find(rule =>
+    rule.selector.startsWith("#app-mount") &&
+    rule.nodes.some(node => node.prop === "background" && node.value.includes("--rz-composer-tint"))
+  );
+  assert.ok(body, "glass effect belongs on the composer capsule");
+  assert.ok(body.nodes.some(node => node.prop === "backdrop-filter" && node.value.includes("blur(17px)")));
+});
+
+test("quest bar has a stable selector, frost and scoped inner cleanup", () => {
+  const bar = findRules('[data-testid="quest-bar-container"]').find(rule =>
+    rule.nodes.some(node => node.prop === "backdrop-filter" && node.value.includes("blur(17px)"))
+  );
+  assert.ok(bar);
+  assert.ok(bar.nodes.some(node => node.prop === "background" && node.value.includes("--rz-quest-card-tint")));
+  const inner = findRules('[data-testid="quest-bar-container"]').find(rule =>
+    rule.selector.includes("postEnrollmentBackground_") &&
+    rule.nodes.some(node => node.prop === "background-image" && node.value === "none")
+  );
+  assert.ok(inner);
+  assert.doesNotMatch(inner.selector, /\[class\*="button_/);
+});
+
+test("opacity fallback keeps chat and quest text legible without backdrop-filter", () => {
+  let found = false;
+  root.walkAtRules("supports", rule => {
+    if (!rule.params.startsWith("not ")) return;
+    const str = rule.toString();
+    if (str.includes("--rz-chat-history-tint: rgba(7, 5, 24, 0.88)") &&
+        str.includes("--rz-quest-card-tint: rgba(20, 15, 48, 0.90)")) found = true;
+  });
+  assert.ok(found);
 });
