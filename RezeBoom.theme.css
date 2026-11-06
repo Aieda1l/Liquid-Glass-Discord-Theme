@@ -1,7 +1,7 @@
 /**
  * @name Reze Boom — Liquid Glass
  * @author a1edail
- * @version 4.2.1
+ * @version 4.2.2
  * @description Wallpaper-backed liquid glass with refractive-looking rims, glossy controls, water-like selection and violet ambient light.
  * @source https://github.com/Aieda1l/Liquid-Glass-Discord-Theme
  * @updateUrl https://raw.githubusercontent.com/Aieda1l/Liquid-Glass-Discord-Theme/main/RezeBoom.theme.css
@@ -160,83 +160,6 @@ body {
   inherits: false;
   initial-value: 0%;
 }
-/* Master glow intensity for the server-icon backlight.
-   Animations run continuously; this property scales every visible value in
-   the keyframes, so transitioning it from 0 to 1 (and back) fades the glow
-   in/out smoothly. Avoids Chromium's well-known "transition fails to fire
-   when an animation is removed" issue, because the animation is never
-   removed — only its output is gated by --rz-glow. */
-@property --rz-glow {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 0;
-}
-
-/* ================================================================
-   KEYFRAMES
-   ================================================================ */
-
-/* Backlit-LED breathe — pulses the bloom blobs behind the server icon.
-   Every visible value is multiplied by --rz-glow, so the animation produces
-   no glow at rest (--rz-glow: 0) and full breathing at hover (--rz-glow: 1).
-   Transitioning --rz-glow on the host listItem fades the entire effect
-   smoothly in BOTH directions, regardless of which animation frame is
-   current at the moment of hover-in / hover-out. */
-
-/* Inner core — modest pulse, stays bright */
-@keyframes rz-led-breathe-inner {
-  0%, 100% {
-    transform: translate(-50%, -50%) scale(calc(0.5 + 0.90 * var(--rz-glow)));
-    filter: blur(calc(14px + 2px * var(--rz-glow)));
-    opacity: var(--rz-glow);
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(calc(0.5 + 1.15 * var(--rz-glow)));
-    filter: blur(calc(14px + 8px * var(--rz-glow)));
-    opacity: var(--rz-glow);
-  }
-}
-
-/* Outer ambient — pronounced HEARTBEAT thump:
-   scale 1.45 → 2.50, blur 20 → 40px, opacity 0.50 → 1.00 across the cycle. */
-@keyframes rz-led-breathe-outer {
-  0%, 100% {
-    transform: translate(-50%, -50%) scale(calc(0.4 + 1.05 * var(--rz-glow)));
-    filter: blur(calc(20px + 0px * var(--rz-glow)));
-    opacity: calc(0.50 * var(--rz-glow));
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(calc(0.4 + 2.10 * var(--rz-glow)));
-    filter: blur(calc(20px + 20px * var(--rz-glow)));
-    opacity: calc(1.00 * var(--rz-glow));
-  }
-}
-
-/* Box-shadow pulse — alphas are scaled by --rz-glow so resting (--rz-glow: 0)
-   produces fully transparent shadows (no glow). */
-@keyframes rz-led-pulse {
-  0%, 100% {
-    filter:
-      brightness(calc(1 + 0.05 * var(--rz-glow)))
-      saturate(calc(1 + 0.09 * var(--rz-glow)));
-    box-shadow:
-      0 0  3px rgba(190, 150, 255, calc(0.95 * var(--rz-glow))),
-      0 0  8px rgba(130,  90, 248, calc(0.72 * var(--rz-glow))),
-      0 0 16px rgba( 81,  67, 200, calc(0.42 * var(--rz-glow))),
-      0 0 28px rgba( 70,  55, 200, calc(0.16 * var(--rz-glow)));
-  }
-  50% {
-    filter:
-      brightness(calc(1 + 0.36 * var(--rz-glow)))
-      saturate(calc(1 + 0.56 * var(--rz-glow)));
-    box-shadow:
-      0 0  5px rgba(190, 150, 255, calc(0.95 * var(--rz-glow))),
-      0 0 12px rgba(130,  90, 248, calc(0.72 * var(--rz-glow))),
-      0 0 24px rgba( 81,  67, 200, calc(0.42 * var(--rz-glow))),
-      0 0 40px rgba( 70,  55, 200, calc(0.16 * var(--rz-glow)));
-  }
-}
-
 /* Slow conic-rim rotation — subtle "light catching the edge of glass" */
 @keyframes rz-rim-rotate {
   to { --rz-rim-angle: 360deg; }
@@ -774,166 +697,91 @@ section[aria-label="User area"]::after {
 }
 
 /* ================================================================
-   FOLDERS   — Glassy folder background
+   GUILD FOLDERS + SAFE ICON-ONLY LIGHTING
+   ================================================================
+   Never attach pseudo elements or filters to listItem_: Discord uses
+   neighboring layers for unread pills and badges. Keep icon positions,
+   sizes, and folder preview children entirely native.
    ================================================================ */
 
-[class*="folder_"],
-[class*="folder-"],
-[class*="expandedFolderBackground_"],
-[class*="expandedFolderBackground-"] {
-  border-radius: var(--rz-radius-lg) !important;
+:root {
+  --rz-folder-glass-tint: rgba(29, 22, 66, 0.35);
+  --rz-folder-glass-blur: 9px;
+  --rz-icon-hover-glow: rgba(155, 119, 255, 0.30);
 }
 
-[class*="folder_"][class*="wrapper"]:hover,
-[class*="folder-"][class*="wrapper"]:hover {
-  backdrop-filter: blur(8px) saturate(150%) !important;
-  -webkit-backdrop-filter: blur(8px) saturate(150%) !important;
+/* A dedicated folder button and the expanded folder backing are separate
+   glass panes. The icon glyph and individual previews remain untouched. */
+#app-mount :is([class*="guilds_"], [class*="guilds-"], .vc-betterFolders-sidebar)
+  :is([class*="folderButton_"], [class*="folderButton-"]) {
+  border-radius: 17px !important;
+  background:
+    radial-gradient(ellipse 94% 65% at 24% -10%, rgba(255,255,255,.23), transparent 76%),
+    linear-gradient(155deg, rgba(168,148,255,.11), transparent 55%, rgba(66,51,160,.09)),
+    var(--rz-folder-glass-tint) !important;
+  outline: 1px solid rgba(233,238,255,.21) !important;
+  outline-offset: -1px;
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,.29),
+    inset 0 -2px 5px rgba(100,80,210,.16),
+    0 4px 12px rgba(3,1,19,.19) !important;
+  backdrop-filter: blur(var(--rz-folder-glass-blur)) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(var(--rz-folder-glass-blur)) saturate(140%) !important;
+  transition: outline-color 200ms ease, box-shadow 200ms ease !important;
 }
 
-/* ================================================================
-   ╔═══════════════════════════════════════════════════════════╗
-   ║   BACKLIT-LED HOVER GLOW   — Animated server icon halo     ║
-   ║   Layers: blob bloom (::before) + outer ambient (::after)  ║
-   ║         + box-shadow ring cascade on the icon wrapper      ║
-   ╚═══════════════════════════════════════════════════════════╝
-   ================================================================ */
-
-/* listItem is the master gate: --rz-glow drives every visible glow value
-   in the keyframes below. Transitioning --rz-glow fades the entire effect
-   in and out smoothly, in BOTH directions, no matter what frame of the
-   loop is current — because the animation never starts/stops, only the
-   property that scales its output changes. */
-:is([class^="guilds_"],[class*=" guilds_"])   [class*="listItem_"],
-:is([class^="guilds-"], [class*=" guilds-"])   [class*="listItem-"],
-:is([class^="guilds_"],[class*=" guilds_"])   [class*="listItem-"],
-:is([class^="guilds-"], [class*=" guilds-"])   [class*="listItem_"] {
-  position: relative;
-  overflow: visible !important;
-  isolation: isolate;
-  --rz-glow: 0;
-  transition: --rz-glow var(--rz-anim-base) var(--rz-ease-glass);
+#app-mount :is([class*="guilds_"], [class*="guilds-"], .vc-betterFolders-sidebar)
+  :is([class*="folderButton_"], [class*="folderButton-"]):is(:hover, :focus-visible) {
+  outline-color: rgba(244,247,255,.42) !important;
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,.48),
+    inset 0 -2px 6px rgba(125,95,235,.18),
+    0 0 13px rgba(162,128,255,.25),
+    0 4px 14px rgba(3,1,19,.18) !important;
 }
 
-/* SELECTED: persistent moderate glow (at 0.75 intensity
-   the breathing is barely visible — looks like a static lit state). */
-:is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem_"]:has([class*="selected"]),
-:is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem-"]:has([class*="selected"]),
-:is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem-"]:has([class*="selected"]),
-:is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem_"]:has([class*="selected"]) {
-  --rz-glow: 0.75;
+#app-mount :is([class*="guilds_"], [class*="guilds-"], .vc-betterFolders-sidebar)
+  :is([class*="expandedFolderBackground_"], [class*="expandedFolderBackground-"]) {
+  border-radius: 20px !important;
+  background:
+    linear-gradient(180deg, rgba(201,181,255,.11), transparent 48%),
+    var(--rz-folder-glass-tint) !important;
+  outline: 1px solid rgba(235,239,255,.10) !important;
+  outline-offset: -1px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.17), inset 0 0 12px rgba(130,99,220,.07) !important;
+  backdrop-filter: blur(var(--rz-folder-glass-blur)) saturate(132%) !important;
+  -webkit-backdrop-filter: blur(var(--rz-folder-glass-blur)) saturate(132%) !important;
 }
 
-/* HOVER: full intensity. Declared after :has(selected) so a selected+hover
-   state correctly resolves to 1, not 0.4. */
-:is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem_"]:hover,
-:is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem-"]:hover,
-:is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem-"]:hover,
-:is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem_"]:hover {
-  --rz-glow: 1;
+/* Real server icon artwork only: NOT listItem_, generic wrapper_,
+   selected/unread pills or badge containers. No transform/scale/filter. */
+#app-mount :is([class*="guilds_"], [class*="guilds-"])
+  [class*="blobContainer_"] :is([class*="childWrapper_"], img[class*="icon_"]) {
+  transition: box-shadow 220ms ease !important;
 }
 
-/* Inner glow blob — close, bright bloom. Animation always running; opacity
-   and scale come from the keyframe (gated by --rz-glow), so at rest the
-   element is invisible without needing a separate hover override. */
-:is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem_"]::before,
-:is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem-"]::before,
-:is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem-"]::before,
-:is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem_"]::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 50% 50%,
-    rgba(190, 150, 255, 0.95) 0%,
-    rgba(130,  90, 248, 0.72) 28%,
-    rgba( 81,  67, 200, 0.42) 58%,
-    transparent 80%);
-  pointer-events: none;
-  z-index: -1;
-  mix-blend-mode: screen;
-  animation: rz-led-breathe-inner 2.4s ease-in-out infinite;
-  animation-play-state: paused;
+#app-mount :is([class*="guilds_"], [class*="guilds-"])
+  [class*="blobContainer_"]:is(:hover, :focus-within)
+  :is([class*="childWrapper_"], img[class*="icon_"]) {
+  box-shadow:
+    0 0 8px rgba(193,168,255,.43),
+    0 0 17px var(--rz-icon-hover-glow),
+    0 0 25px rgba(101,65,219,.12) !important;
 }
 
-/* Outer ambient bloom — pronounced HEARTBEAT pulse, wider/softer */
-:is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem_"]::after,
-:is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem-"]::after,
-:is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem-"]::after,
-:is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem_"]::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 50% 50%,
-    transparent 22%,
-    rgba(100,  72, 220, 0.40) 45%,
-    rgba( 81,  67, 181, 0.20) 65%,
-    transparent 86%);
-  pointer-events: none;
-  z-index: -1;
-  mix-blend-mode: screen;
-  animation: rz-led-breathe-outer 2.4s ease-in-out infinite;
-  animation-play-state: paused;
+#app-mount :is([class*="guilds_"], [class*="guilds-"])
+  [class*="blobContainer_"]:has([class*="selected_"])
+  :is([class*="childWrapper_"], img[class*="icon_"]) {
+  box-shadow: 0 0 11px rgba(163,127,255,.22) !important;
 }
 
-/* Icon wrapper carries the contoured drop-shadow halo. Animation runs
-   continuously; drop-shadow alphas in the keyframe are scaled by --rz-glow
-   so they're fully transparent at rest (--rz-glow: 0). drop-shadow follows
-   the actual rendered alpha mask, so the halo contours the rounded-square
-   icon shape on idle and the circle shape on hover. */
-:is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem_"] [class*="wrapper_"],
-:is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem-"] [class*="wrapper-"],
-:is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem-"] [class*="wrapper_"],
-:is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem_"] [class*="wrapper-"] {
-  position: relative;
-  z-index: 1;
-  animation: rz-led-pulse 2.4s ease-in-out infinite;
-  animation-play-state: paused;
-  border-radius: 24px; 
-  transition: border-radius 0.2s ease-out;
-}
-
-:is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem_"]:hover [class*="wrapper_"],
-:is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem-"]:hover [class*="wrapper-"],
-:is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem-"]:hover [class*="wrapper_"],
-:is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem_"]:hover [class*="wrapper-"],
-:is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem_"]:has([class*="selected"]) [class*="wrapper_"],
-:is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem-"]:has([class*="selected"]) [class*="wrapper-"],
-:is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem-"]:has([class*="selected"]) [class*="wrapper_"],
-:is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem_"]:has([class*="selected"]) [class*="wrapper-"] {
-  border-radius: 16px;
-}
-
-/* PERF — Run breathing animations only while hovered. animation-play-state
-   is enum (not transitionable) but the smooth fade still works because all
-   keyframe outputs scale through --rz-glow, which IS transitioned. On
-   un-hover, the animation pauses at its current frame and --rz-glow fades
-   to 0 — the paused frame fades to invisible. On re-hover, the animation
-   resumes from where it stopped. Saves dozens of keyframe re-evaluations
-   per frame across all server icons at idle.
-
-   Selected (non-hovered) icons stay paused; --rz-glow: 0.75 plus the
-   paused frame-0 keyframe values produces a static moderate glow — the
-   active server reads as "lit" without continuously pulsing. */
-:is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem_"]:hover::before,
-:is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem-"]:hover::before,
-:is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem-"]:hover::before,
-:is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem_"]:hover::before,
-:is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem_"]:hover::after,
-:is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem-"]:hover::after,
-:is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem-"]:hover::after,
-:is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem_"]:hover::after,
-:is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem_"]:hover [class*="wrapper_"],
-:is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem-"]:hover [class*="wrapper-"],
-:is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem-"]:hover [class*="wrapper_"],
-:is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem_"]:hover [class*="wrapper-"] {
-  animation-play-state: running;
+@media (prefers-reduced-motion: reduce) {
+  #app-mount :is([class*="guilds_"], [class*="guilds-"])
+    [class*="blobContainer_"] :is([class*="childWrapper_"], img[class*="icon_"]),
+  #app-mount :is([class*="guilds_"], [class*="guilds-"])
+    :is([class*="folderButton_"], [class*="folderButton-"]) {
+    transition: none !important;
+  }
 }
 
 /* ================================================================
@@ -1383,44 +1231,7 @@ button[class*="button-"][class*="primary"]:active {
     animation: none !important;
   }
 
-  /* Server-icon glow: kill the breathing animations and substitute static
-     filter/transform/opacity that still respond to --rz-glow, so hover and
-     selected states still light up — just without the pulse. Values are
-     roughly the midpoint of each animation's two keyframes. */
-  :is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem_"]::before,
-  :is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem-"]::before,
-  :is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem-"]::before,
-  :is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem_"]::before {
-    animation: none !important;
-    transform: translate(-50%, -50%) scale(calc(0.5 + 1.00 * var(--rz-glow)));
-    filter: blur(calc(14px + 5px * var(--rz-glow)));
-    opacity: var(--rz-glow);
-  }
 
-  :is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem_"]::after,
-  :is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem-"]::after,
-  :is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem-"]::after,
-  :is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem_"]::after {
-    animation: none !important;
-    transform: translate(-50%, -50%) scale(calc(0.4 + 1.55 * var(--rz-glow)));
-    filter: blur(calc(20px + 10px * var(--rz-glow)));
-    opacity: calc(0.75 * var(--rz-glow));
-  }
-
-  :is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem_"] [class*="wrapper_"],
-  :is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem-"] [class*="wrapper-"],
-  :is([class^="guilds_"],[class*=" guilds_"]) [class*="listItem-"] [class*="wrapper_"],
-  :is([class^="guilds-"], [class*=" guilds-"]) [class*="listItem_"] [class*="wrapper-"] {
-    animation: none !important;
-    filter:
-      brightness(calc(1 + 0.14 * var(--rz-glow)))
-      saturate(calc(1 + 0.22 * var(--rz-glow)));
-    box-shadow:
-      0 0  4px rgba(190, 150, 255, calc(0.95 * var(--rz-glow))),
-      0 0 10px rgba(130,  90, 248, calc(0.72 * var(--rz-glow))),
-      0 0 20px rgba( 81,  67, 200, calc(0.42 * var(--rz-glow))),
-      0 0 34px rgba( 70,  55, 200, calc(0.16 * var(--rz-glow)));
-  }
 }
 
 /* ================================================================
@@ -1802,8 +1613,8 @@ button[class*="button-"][class*="primary"]:active {
    ================================================================ */
 
 :root {
-  --rz-chat-history-blur: 18px;
-  --rz-chat-history-tint: rgba(7, 5, 24, 0.43);
+  --rz-chat-history-blur: 6px;
+  --rz-chat-history-tint: rgba(7, 5, 24, 0.32);
   --rz-composer-tint: rgba(20, 15, 51, 0.35);
   --rz-quest-card-tint: rgba(20, 15, 48, 0.39);
 }
@@ -1818,8 +1629,8 @@ button[class*="button-"][class*="primary"]:active {
     radial-gradient(ellipse 110% 65% at 75% -15%, rgba(163, 141, 246, 0.075), transparent 65%),
     linear-gradient(150deg, rgba(23, 17, 52, 0.08), rgba(6, 4, 19, 0.10)),
     var(--rz-chat-history-tint) !important;
-  -webkit-backdrop-filter: blur(var(--rz-chat-history-blur)) saturate(125%) brightness(0.88) !important;
-  backdrop-filter: blur(var(--rz-chat-history-blur)) saturate(125%) brightness(0.88) !important;
+  -webkit-backdrop-filter: blur(var(--rz-chat-history-blur)) saturate(112%) brightness(0.98) !important;
+  backdrop-filter: blur(var(--rz-chat-history-blur)) saturate(112%) brightness(0.98) !important;
   box-shadow:
     inset 1px 0 0 rgba(255, 255, 255, 0.065),
     inset 0 1px 0 rgba(255, 255, 255, 0.045) !important;
@@ -1927,5 +1738,82 @@ button[class*="button-"][class*="primary"]:active {
     --rz-chat-history-tint: rgba(7, 5, 24, 0.88);
     --rz-composer-tint: rgba(20, 15, 51, 0.86);
     --rz-quest-card-tint: rgba(20, 15, 48, 0.90);
+  }
+}
+
+/* ================================================================
+   SHARED GLASS FINISH — SMALL SURFACES
+   ================================================================
+   Use specific UI targets, not global divs/containers. Retain
+   functional states, semantic colors, media and layout dimensions.
+   ================================================================ */
+
+/* DM search and top search: a clear capsule with a fine specular rim. */
+#app-mount :is(
+  [class*="searchBarComponent_"], [class*="searchBarComponent-"],
+  [class*="searchBar_"] input, [class*="searchBar-"] input
+) {
+  background:
+    linear-gradient(165deg, rgba(255,255,255,.105), transparent 60%),
+    rgba(20,15,48,.32) !important;
+  border: 1px solid rgba(237,238,255,.14) !important;
+  border-radius: 999px !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.15), 0 2px 7px rgba(3,1,20,.12) !important;
+}
+
+/* A focused search/input surface gets one clear accessible outline. */
+#app-mount :is(
+  [class*="searchBarComponent_"], [class*="searchBarComponent-"],
+  [class*="searchBar_"] input, [class*="searchBar-"] input
+):focus-visible {
+  outline: 2px solid var(--rz-liquid-focus);
+  outline-offset: 1px;
+}
+
+/* Settings cards: preserve their padding, toggles, semantic colors and
+   children; decorate the card itself, not an entire settings region. */
+#app-mount :is([class*="contentRegion_"], [class*="contentRegion-"])
+  :is([class*="card_"], [class*="card-"], [class*="settingCard_"]) {
+  background-image:
+    radial-gradient(ellipse 100% 85% at 12% -16%, rgba(255,255,255,.10), transparent 72%) !important;
+  border: 1px solid rgba(236,238,255,.11) !important;
+  border-radius: var(--rz-radius-lg) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.13), 0 5px 20px rgba(3,1,20,.15) !important;
+}
+
+/* Reaction chips and polls receive a low-cost glass coat. Keep the
+   original pressed/selected colors instead of replacing every reaction. */
+#app-mount :is([class*="reaction_"], [class*="reaction-"]) {
+  border-radius: 12px !important;
+  border-color: rgba(237,238,255,.16) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.13), 0 2px 7px rgba(3,1,20,.12) !important;
+}
+#app-mount :is([class*="reactionMe_"], [class*="reactionMe-"]) {
+  border-color: rgba(174,153,255,.55) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.20), 0 0 9px rgba(140,108,238,.18) !important;
+}
+#app-mount :is([class*="pollContainer_"], [class*="pollContainer-"], [class*="embedFull_"], [class*="embedFull-"]) {
+  border-radius: var(--rz-radius-md) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.11), 0 3px 14px rgba(3,1,20,.13) !important;
+}
+
+/* Member rows and header action buttons only brighten on interaction.
+   No constant backdrop-filter for every member in a long list. */
+#app-mount :is([class*="membersWrap_"], [class*="membersWrap-"])
+  :is([class*="member_"], [class*="member-"]):hover {
+  border-radius: var(--rz-radius-md) !important;
+  background-color: rgba(211,195,255,.07) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+#app-mount :is([class*="toolbar_"], [class*="toolbar-"])
+  :is([class*="iconWrapper_"], [class*="iconWrapper-"]):is(:hover, :focus-visible) {
+  border-radius: 12px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 0 9px rgba(155,122,255,.16) !important;
+}
+
+/* GPU safety and legibility: don't stack blur on tiny reaction chips. */
+@media (prefers-reduced-motion: reduce) {
+  #app-mount :is([class*="searchBarComponent_"], [class*="searchBarComponent-"]) {
+    transition: none !important;
   }
 }
