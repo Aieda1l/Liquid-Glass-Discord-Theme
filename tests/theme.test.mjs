@@ -200,7 +200,7 @@ test("server unread markers and generic wrappers are never glow targets", () => 
 test("folder glass does not change icon positions or preview content", () => {
   const folder = findRules("folderButton_").find(rule => rule.nodes.some(n => n.prop === "backdrop-filter"));
   assert.ok(folder);
-  assert.ok(folder.nodes.some(n => n.prop === "border" && n.important));
+  assert.ok(folder.nodes.some(n => n.prop === "outline" && n.important));
   assert.ok(findRules("expandedFolderBackground_").some(rule => rule.nodes.some(n => n.prop === "backdrop-filter")));
   const folderRules=[];
   root.walkRules(r=>{if(r.selector.includes("folderButton_")||r.selector.includes("blobContainer_"))folderRules.push(r)});
