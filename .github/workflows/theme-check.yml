@@ -1,0 +1,22 @@
+name: Theme CSS checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  css:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install parser
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Parse CSS and run regression tests
+        run: npm test
