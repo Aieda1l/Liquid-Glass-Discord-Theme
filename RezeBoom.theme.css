@@ -1,7 +1,7 @@
 /**
  * @name Reze Boom — Liquid Glass
  * @author a1edail
- * @version 4.2.3
+ * @version 4.2.4
  * @description Wallpaper-backed liquid glass with refractive-looking rims, glossy controls, water-like selection and violet ambient light.
  * @source https://github.com/Aieda1l/Liquid-Glass-Discord-Theme
  * @updateUrl https://raw.githubusercontent.com/Aieda1l/Liquid-Glass-Discord-Theme/main/RezeBoom.theme.css
@@ -764,31 +764,110 @@ section[aria-label="User area"]::after {
   -webkit-backdrop-filter: blur(var(--rz-folder-glass-blur)) saturate(132%) !important;
 }
 
-/* Real server icon artwork only: NOT listItem_, generic wrapper_,
-   selected/unread pills or badge containers. No transform/scale/filter. */
-#app-mount :is([class*="guilds_"], [class*="guilds-"])
-  [class*="blobContainer_"] :is([class*="childWrapper_"], img[class*="icon_"]) {
-  transition: box-shadow 220ms ease !important;
+/* Purple halo lives ONLY on the icon's own SVG, never on the guild
+   list item, marker pill or generic wrapper. The SVG is inside the
+   blobContainer; unread markers/badges are siblings outside this target.
+   Do not touch width, border radius, transform or the SVG mask. */
+@keyframes rz-guild-icon-halo {
+  0%, 100% {
+    filter:
+      drop-shadow(0 0 3px rgba(196, 166, 255, 0.82))
+      drop-shadow(0 0 9px rgba(137, 91, 249, 0.60))
+      drop-shadow(0 0 17px rgba(88, 60, 215, 0.32));
+  }
+  50% {
+    filter:
+      drop-shadow(0 0 5px rgba(209, 179, 255, 0.96))
+      drop-shadow(0 0 14px rgba(144, 91, 255, 0.78))
+      drop-shadow(0 0 24px rgba(88, 60, 215, 0.46));
+  }
 }
 
+@keyframes rz-guild-fallback-halo {
+  0%, 100% {
+    box-shadow:
+      0 0 5px rgba(196, 166, 255, 0.82),
+      0 0 13px rgba(137, 91, 249, 0.60),
+      0 0 24px rgba(88, 60, 215, 0.33);
+  }
+  50% {
+    box-shadow:
+      0 0 7px rgba(209, 179, 255, 0.96),
+      0 0 18px rgba(144, 91, 255, 0.78),
+      0 0 33px rgba(88, 60, 215, 0.44);
+  }
+}
+
+/* Explicitly exclude folder buttons/icons: their own frosted background
+   is styled above, but folders are not individual server icons. */
 #app-mount :is([class*="guilds_"], [class*="guilds-"])
-  [class*="blobContainer_"]:is(:hover, :focus-within)
+  [class*="blobContainer_"]:not(:has([class*="folderButton_"], [class*="folderButton-"], [class*="folderIcon_"], [class*="folderIcon-"]))
+  svg[class*="svg_"] {
+  transition: filter 240ms ease !important;
+}
+
+/* Selected guild: a persistent violet ring, with no idle animation. */
+#app-mount :is([class*="guilds_"], [class*="guilds-"])
+  [class*="blobContainer_"]:not(:has([class*="folderButton_"], [class*="folderButton-"], [class*="folderIcon_"], [class*="folderIcon-"]))
+  :is([class*="wrapper_"][class*="selected_"], [class*="selected_"]) svg[class*="svg_"],
+#app-mount :is([class*="guilds_"], [class*="guilds-"])
+  [class*="blobContainer_"]:not(:has([class*="folderButton_"], [class*="folderButton-"], [class*="folderIcon_"], [class*="folderIcon-"])):has([class*="selected_"])
+  svg[class*="svg_"] {
+  filter:
+    drop-shadow(0 0 3px rgba(190, 150, 255, 0.78))
+    drop-shadow(0 0 10px rgba(130, 90, 248, 0.52))
+    drop-shadow(0 0 20px rgba(81, 67, 200, 0.32)) !important;
+}
+
+/* Hover / keyboard focus: bright pulsing light on SVG icon artwork only. */
+#app-mount :is([class*="guilds_"], [class*="guilds-"])
+  [class*="blobContainer_"]:not(:has([class*="folderButton_"], [class*="folderButton-"], [class*="folderIcon_"], [class*="folderIcon-"])):is(:hover, :focus-within)
+  svg[class*="svg_"] {
+  animation: rz-guild-icon-halo 2.35s ease-in-out infinite !important;
+}
+
+/* Fallback for builds with no SVG icon host. Do not light BOTH the
+   fallback and SVG on the same server: that would double the halo. */
+#app-mount :is([class*="guilds_"], [class*="guilds-"])
+  [class*="blobContainer_"]:not(:has(svg[class*="svg_"], [class*="folderButton_"], [class*="folderButton-"], [class*="folderIcon_"], [class*="folderIcon-"]))
+  :is([class*="childWrapper_"], img[class*="icon_"]) {
+  transition: box-shadow 240ms ease !important;
+}
+#app-mount :is([class*="guilds_"], [class*="guilds-"])
+  [class*="blobContainer_"]:not(:has(svg[class*="svg_"], [class*="folderButton_"], [class*="folderButton-"], [class*="folderIcon_"], [class*="folderIcon-"])):has([class*="selected_"])
   :is([class*="childWrapper_"], img[class*="icon_"]) {
   box-shadow:
-    0 0 8px rgba(193,168,255,.43),
-    0 0 17px var(--rz-icon-hover-glow),
-    0 0 25px rgba(101,65,219,.12) !important;
+    0 0 5px rgba(190, 150, 255, 0.72),
+    0 0 13px rgba(130, 90, 248, 0.50),
+    0 0 24px rgba(81, 67, 200, 0.28) !important;
 }
-
 #app-mount :is([class*="guilds_"], [class*="guilds-"])
-  [class*="blobContainer_"]:has([class*="selected_"])
+  [class*="blobContainer_"]:not(:has(svg[class*="svg_"], [class*="folderButton_"], [class*="folderButton-"], [class*="folderIcon_"], [class*="folderIcon-"])):is(:hover, :focus-within)
   :is([class*="childWrapper_"], img[class*="icon_"]) {
-  box-shadow: 0 0 11px rgba(163,127,255,.22) !important;
+  animation: rz-guild-fallback-halo 2.35s ease-in-out infinite !important;
 }
 
+/* Motion preference: retain a static ring without pulsing. */
 @media (prefers-reduced-motion: reduce) {
   #app-mount :is([class*="guilds_"], [class*="guilds-"])
-    [class*="blobContainer_"] :is([class*="childWrapper_"], img[class*="icon_"]),
+    [class*="blobContainer_"]:is(:hover, :focus-within)
+    :is(svg[class*="svg_"], [class*="childWrapper_"], img[class*="icon_"]) {
+    animation: none !important;
+    transition: none !important;
+  }
+  #app-mount :is([class*="guilds_"], [class*="guilds-"])
+    [class*="blobContainer_"]:is(:hover, :focus-within) svg[class*="svg_"] {
+    filter:
+      drop-shadow(0 0 4px rgba(209, 179, 255, 0.92))
+      drop-shadow(0 0 12px rgba(144, 91, 255, 0.68)) !important;
+  }
+  #app-mount :is([class*="guilds_"], [class*="guilds-"])
+    [class*="blobContainer_"]:not(:has(svg[class*="svg_"])):is(:hover, :focus-within)
+    :is([class*="childWrapper_"], img[class*="icon_"]) {
+    box-shadow:
+      0 0 6px rgba(209, 179, 255, 0.87),
+      0 0 18px rgba(144, 91, 255, 0.60) !important;
+  }
   #app-mount :is([class*="guilds_"], [class*="guilds-"])
     :is([class*="folderButton_"], [class*="folderButton-"]) {
     transition: none !important;
