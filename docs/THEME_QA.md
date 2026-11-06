@@ -1,6 +1,6 @@
 # Reze Boom — Liquid Glass UI QA matrix
 
-Version: **4.2.3**. This is a manual verification checklist, not evidence that Discord was rendered or that all items passed. Use the latest Windows Discord/Vencord build with this theme alone, then repeat important checks with other plugins enabled.
+Version: **4.2.4**. This is a manual verification checklist, not evidence that Discord was rendered or that all items passed. Use the latest Windows Discord/Vencord build with this theme alone, then repeat important checks with other plugins enabled.
 
 ## Must-pass screenshot regressions
 
@@ -11,7 +11,7 @@ Version: **4.2.3**. This is a manual verification checklist, not evidence that D
 | Quest bar | Translucent card, readable text, clickable claim button | Opaque fill, masked reward button or card overflowing sidebar |
 | Folder buttons | Wet-glass tile, folder glyph and mini-server previews centered | Icon resizing, shifted mini-icons, clipped folder thumbnails |
 | Expanded folder | Frosted vertical backing, native open/close animation | Folder content clipped, blank background, overlay blocking clicks |
-| Server icon hover | Subtle light on actual avatar artwork only | White unread dot / selection indicator glowing, resizing or disappearing |
+| Server icon hover | Bright animated violet halo on the server icon artwork only | White unread dot / badges glowing, or the server list row changing geometry |
 | Unread/selected guild | White pill, red notification badge and normal hover behavior | Duplicate white dots, shifted marker or modified badges |
 | Server-name tooltip hover | One glass container with legible title/details | Duplicate rectangular outline or inset glass frame |
 | Small name tooltip (e.g. Ash) | Single tooltip outline, text fully readable | A second border around the label |
@@ -40,7 +40,8 @@ Version: **4.2.3**. This is a manual verification checklist, not evidence that D
 - No global animation/transform/filter on generic server `wrapper_` elements.
 - No generic `[class*="folder_"]` modifications; only dedicated folder surfaces.
 - No per-message backdrop filters; one shared `chatContent_` blur.
-- No permanent GPU animation on idle guild icons, selected state or folder previews.
+- Animated purple glow only while hovering/focusing an actual server icon; selected server retains a static ring, and no animation runs when idle.
+- Reduced-motion mode retains a static purple ring without animation; folders remain excluded from the halo.
 - Blur and surface styling should not intercept pointer or keyboard events.
 
 ## How to verify a Discord UI regression

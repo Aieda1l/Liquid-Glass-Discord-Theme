@@ -40,7 +40,7 @@ Open `RezeBoom.theme.css` and edit the variables at the beginning of the `:root`
 | `--rz-composer-tint` | Glass tint for the message composer capsule. |
 | `--rz-quest-card-tint` | Higher-opacity glass tint for the Quest card (0.88 by default) to prevent underlying sidebar content showing through. |
 | `--rz-folder-glass-tint`, `--rz-folder-glass-blur` | Translucency and blur on server folder buttons and expanded folder backings. |
-| `--rz-icon-hover-glow` | Glow intensity on the icon art only, not unread or selection indicators. |
+| `--rz-icon-hover-glow` | Intensity of the restored purple pulsing icon halo on hover; unread pills and badges are unaffected. |
 
 To make local changes without losing them during updates, put **only** your variable overrides in Vencord **QuickCSS**, for example:
 
@@ -55,14 +55,14 @@ Use a directly accessible HTTPS image URL, not a web page URL. The theme renders
 
 ## Liquid-glass design
 
-Version **4.2.3** draws from the **Waterline** (liquid navbar) and **Surface Tension** (liquid toggle) React examples supplied by the user, credited in their headers to [guglielmogiannattasio.it](https://guglielmogiannattasio.it/). This theme adapts the **appearance** rather than copying their JavaScript or WebGL shader.
+Version **4.2.4** draws from the **Waterline** (liquid navbar) and **Surface Tension** (liquid toggle) React examples supplied by the user, credited in their headers to [guglielmogiannattasio.it](https://guglielmogiannattasio.it/). This theme adapts the **appearance** rather than copying their JavaScript or WebGL shader.
 
 - **Selected channels and DMs:** curved translucent pill selection, specular meniscus highlights, subtle spring-settle.
 - **Server folders and glyphs:** glass button/expanded folder backings; folder glyph, miniature previews, unread indicator and badge geometry are left to Discord.
 - **Tooltips and menus:** one glass frame on each tooltip shell; inner tooltip content is unpainted to prevent double rectangles.
 - **User panel controls:** microphone/headphone dropdown chevrons retain their native button hit targets and focus outlines without independent glass capsules.
 - **Quest popup:** one strong but translucent outer glass layer; no nested quest-card coating and no hiding the actual menu/control buttons.
-- **Server-icon glow:** restricted to actual icon artwork on hover, not the surrounding server list item or unread pill.
+- **Server-icon glow:** restored the bright animated purple halo on hover/focus and a steady purple ring on selected servers, targeting only the icon SVG/artwork. Unread markers, folder icons, badges and surrounding server list items remain untouched.
 - **Switches:** a glassy stateful track, white reflected rims, and a compressed knob on press (where Discord exposes a recognizable knob).
 - **Menus, popouts and modals:** layered caustics, violet/blue edge fringing and paused-at-rest optical rims.
 - **Chat history:** one restrained 6px blur layer on the chat-content pane, with an adjustable dark overlay so artwork is still recognizable.

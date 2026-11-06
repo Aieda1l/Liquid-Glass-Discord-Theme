@@ -22,7 +22,7 @@ test("valid CSS syntax and substantive stylesheet", () => {
 test("correct and self-contained theme metadata", () => {
   assert.match(css, /@name Reze Boom — Liquid Glass/);
   assert.match(css, /@author a1edail/);
-  assert.match(css, /@version 4\.2\.3/);
+  assert.match(css, /@version 4\.2\.4/);
   assert.match(css, /@source https:\/\/github\.com\/Aieda1l\/Liquid-Glass-Discord-Theme/);
   assert.match(css, /@updateUrl https:\/\/raw\.githubusercontent\.com\/Aieda1l\/Liquid-Glass-Discord-Theme\/main\/RezeBoom\.theme\.css/);
   assert.doesNotMatch(css, /@invite\b/);
@@ -295,4 +295,71 @@ test("Quest and tooltip fixes do not hide controls or change their geometry", ()
     assert.ok(!["display", "pointer-events", "width", "height", "position", "transform", "overflow"].includes(node.prop),
        `Dropdown must keep its interaction/geometry: ${node.prop}`);
   }
+});
+
+test("purple halo animates only the server icon and not guild unread markers", () => {
+  const clean = css.replace(/\/\*[\s\S]*?\*\//g, "");
+  const targeted = [];
+  root.walkRules(rule => {
+    if (!rule.selector.includes("rz-")) {
+      if (rule.selector.includes("blobContainer_") && rule.nodes.some(n =>
+        n.prop === "animation" && n.value.includes("rz-guild-icon-halo"))) targeted.push(rule);
+    }
+  });
+  assert.equal(targeted.length, 1, "exactly one SVG hover glow rule");
+  assert.match(targeted[0].selector, /blobContainer_/);
+  assert.match(targeted[0].selector, /svg\[class\*="svg_"\]/);
+  assert.match(targeted[0].selector, /folderButton_/);
+  assert.doesNotMatch(targeted[0].selector, /listItem_/);
+
+  assert.doesNotMatch(clean, /\[class\*="listItem[_-]"\]::(?:before|after)/);
+  assert.doesNotMatch(clean, /\[class\*="pill[_-]"\][^{}]*\{[^{}]*(?:filter|box-shadow|animation):/);
+});
+
+test("selected icon halo is visible without forcing animation off on hover", () => {
+  const selected = findRules("blobContainer_").find(rule =>
+    rule.selector.includes(':has([class*="selected_"])') &&
+    rule.selector.includes('svg[class*="svg_"]') &&
+    rule.nodes.some(n => n.prop === "filter" && n.value.includes("drop-shadow")));
+  assert.ok(selected, "selected server icon receives persistent purple halo");
+  assert.ok(!selected.nodes.find(n => n.prop === "filter").important,
+    "important filter would override the hover animation on selected icons");
+
+  const frames = [];
+  root.walkAtRules("keyframes", rule => { if (rule.params === "rz-guild-icon-halo") frames.push(rule); });
+  assert.equal(frames.length, 1);
+  assert.match(frames[0].toString(), /drop-shadow/);
+  assert.match(frames[0].toString(), /--rz-icon-hover-glow/);
+});
+
+test("fallback icon glow is scoped and neither masks nor moves icons", () => {
+  const fallback = findRules("blobContainer_").find(rule =>
+    rule.selector.includes(":not(:has(svg") &&
+    rule.nodes.some(n => n.prop === "animation" && n.value.includes("rz-guild-fallback-halo")));
+  assert.ok(fallback);
+  assert.match(fallback.selector, /childWrapper_/);
+  assert.match(fallback.selector, /folderIcon_/);
+
+  const all = [];
+  root.walkRules(rule => {
+    if (rule.selector.includes("blobContainer_") &&
+        rule.nodes.some(n => /rz-guild-(?:icon|fallback)-halo/.test(n.value))) all.push(rule);
+  });
+  for(const rule of all) for(const node of rule.nodes) {
+    if(node.type !== "decl")continue;
+    assert.ok(!["width","height","position","left","right","top","bottom","overflow",
+      "transform","scale","z-index","pointer-events","border-radius"].includes(node.prop),
+      "glow should not change guild icon geometry or interaction");
+  }
+});
+
+test("reduced motion uses a static purple ring on actual icons", () => {
+  let found = false;
+  root.walkAtRules("media", rule => {
+    if (!rule.params.includes("prefers-reduced-motion")) return;
+    const cssText = rule.toString();
+    if (cssText.includes("blobContainer_") && cssText.includes("animation: none !important") &&
+        cssText.includes("drop-shadow") && cssText.includes("folderButton_")) found = true;
+  });
+  assert.ok(found, "disable pulsing and keep a static icon halo");
 });
