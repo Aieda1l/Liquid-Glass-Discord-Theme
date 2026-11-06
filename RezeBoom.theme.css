@@ -719,19 +719,20 @@ section[aria-label="User area"]::after {
     radial-gradient(ellipse 94% 65% at 24% -10%, rgba(255,255,255,.23), transparent 76%),
     linear-gradient(155deg, rgba(168,148,255,.11), transparent 55%, rgba(66,51,160,.09)),
     var(--rz-folder-glass-tint) !important;
-  border: 1px solid rgba(233,238,255,.21) !important;
+  outline: 1px solid rgba(233,238,255,.21) !important;
+  outline-offset: -1px;
   box-shadow:
     inset 0 1px 1px rgba(255,255,255,.29),
     inset 0 -2px 5px rgba(100,80,210,.16),
     0 4px 12px rgba(3,1,19,.19) !important;
   backdrop-filter: blur(var(--rz-folder-glass-blur)) saturate(140%) !important;
   -webkit-backdrop-filter: blur(var(--rz-folder-glass-blur)) saturate(140%) !important;
-  transition: border-color 200ms ease, box-shadow 200ms ease !important;
+  transition: outline-color 200ms ease, box-shadow 200ms ease !important;
 }
 
 #app-mount :is([class*="guilds_"], [class*="guilds-"], .vc-betterFolders-sidebar)
   :is([class*="folderButton_"], [class*="folderButton-"]):is(:hover, :focus-visible) {
-  border-color: rgba(244,247,255,.42) !important;
+  outline-color: rgba(244,247,255,.42) !important;
   box-shadow:
     inset 0 1px 1px rgba(255,255,255,.48),
     inset 0 -2px 6px rgba(125,95,235,.18),
@@ -745,7 +746,8 @@ section[aria-label="User area"]::after {
   background:
     linear-gradient(180deg, rgba(201,181,255,.11), transparent 48%),
     var(--rz-folder-glass-tint) !important;
-  border: 1px solid rgba(235,239,255,.10) !important;
+  outline: 1px solid rgba(235,239,255,.10) !important;
+  outline-offset: -1px;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.17), inset 0 0 12px rgba(130,99,220,.07) !important;
   backdrop-filter: blur(var(--rz-folder-glass-blur)) saturate(132%) !important;
   -webkit-backdrop-filter: blur(var(--rz-folder-glass-blur)) saturate(132%) !important;
