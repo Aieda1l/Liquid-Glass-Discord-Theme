@@ -1,6 +1,6 @@
 # Liquid Glass FX — Vencord UserPlugin Design Plan
 
-**Status:** Planned only. This document is not an installed or runnable plugin.
+**Status:** Stage A preview source implemented in this repository; not yet GPU-verified or installed in a source-built Vencord client. Live UI integration remains planned.
 **Project:** Reze Boom Liquid Glass (CSS remains the required, independently useful base).
 **Owner / theme author:** a1edail.
 **Design references:** The user-supplied React components **Nimbus UI · Liquid Navbar (“Waterline”)** and **Nimbus UI · Liquid Toggle (“Surface Tension”)**, credited in their source headers to guglielmogiannattasio.it. Their source is a visual and behavioral reference; do not copy shaders or code into the plugin without establishing an appropriate reuse license or obtaining permission.
@@ -125,3 +125,11 @@ Constraints:
 4. Expand to settings toggles, document setup and fallback behavior, and capture before/after screenshots from a live test client.
 
 **Known unknowns:** The exact Discord UI component host and userplugin integration patch points must be inspected in a live development build. A stable CSS selector does not guarantee a stable React module boundary.
+
+## 8. Stage A source milestone (November 2026)
+
+The self-contained `src/userplugins/liquidGlassFx/` proof of concept now contains a settings-mounted WebGL preview, an independently written signed-distance/normal-based fragment shader, texture-sampled refraction of a generated preview wallpaper, spring motion, a CSS fallback and accessible React controls. It intentionally does not patch native Discord UI or read Discord-rendered pixels.
+
+Focused Node tests exercise spring settling, target reversal, reduced motion, pixel-area caps and safety contracts; an isolated TypeScript check was also run. **Not yet verified:** Vencord source build, shader compilation on a real WebGL-capable GPU, actual rendered appearance, live Discord integration and interactive accessibility review in a real client. These must pass before the plugin can be called production-ready.
+
+The installation and scope of this stage are documented in [`src/userplugins/liquidGlassFx/README.md`](../src/userplugins/liquidGlassFx/README.md).

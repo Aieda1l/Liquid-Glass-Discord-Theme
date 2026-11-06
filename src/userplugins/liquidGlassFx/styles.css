@@ -1,0 +1,23 @@
+/* Scoped to the plugin settings preview. No changes to Discord's native controls. */
+.lgfx-root { max-width: 680px; font-family: inherit; }
+.lgfx-description, .lgfx-footnote { margin: 0 0 10px; font-size: 12px; line-height: 1.5; opacity: .88; }
+.lgfx-footnote { margin: 10px 0 0; }
+.lgfx-stage { position: relative; width: 100%; height: 246px; overflow: hidden; isolation: isolate; border: 1px solid rgba(215,197,255,.28); border-radius: 20px; background: radial-gradient(circle at 20% 20%, #5d3f86, transparent 55%), linear-gradient(115deg,#141126,#233c5b); }
+.lgfx-canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+.lgfx-stage[data-gpu="off"] .lgfx-canvas { display: none; }
+.lgfx-nav { position: absolute; z-index: 1; top: 49px; left: 6%; width: 88%; height: 55px; border-radius: 999px; display: flex; align-items: stretch; padding: 3px; gap: 0; box-sizing: border-box; }
+.lgfx-nav-item { z-index: 1; flex: 1; min-width: 0; padding: 0 4px; text-align: center; border: none; border-radius: 999px; background: transparent; color: rgba(245,240,255,.76); font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; transition: color .15s ease; }
+.lgfx-nav-item[data-active="true"], .lgfx-nav-item:hover { color: #fff; }
+.lgfx-nav-item:focus-visible, .lgfx-switch:focus-visible { outline: 2px solid #d9b5ff; outline-offset: 3px; }
+.lgfx-toggle-row { position: absolute; z-index: 1; left: 10%; right: 10%; top: 149px; display: flex; align-items: center; justify-content: space-between; color: #f7efff; font-size: 14px; font-weight: 500; }
+.lgfx-switch { position: relative; box-sizing: border-box; display: block; flex: 0 0 82px; height: 39px; background: transparent; border: none; border-radius: 999px; cursor: pointer; }
+.lgfx-switch-knob { display: none; position: absolute; top: 4px; left: 4px; width: 31px; height: 31px; border-radius: 50%; background: rgba(255,255,255,.88); box-shadow: 0 3px 12px rgba(0,0,0,.22); transition: transform .27s ease; }
+.lgfx-switch[aria-checked="true"] .lgfx-switch-knob { transform: translateX(43px); }
+.lgfx-stage-caption { position: absolute; bottom: 12px; left: 0; right: 0; pointer-events: none; color: rgba(225,220,246,.72); text-align: center; font-size: 9px; letter-spacing: 1.2px; }
+.lgfx-stage[data-gpu="off"] .lgfx-nav { background: rgba(255,255,255,.13); box-shadow: inset 0 1px rgba(255,255,255,.55); backdrop-filter: blur(12px); }
+.lgfx-stage[data-gpu="off"] .lgfx-nav-item[data-active="true"] { background: rgba(227,196,255,.3); box-shadow: inset 0 1px rgba(255,255,255,.5); }
+.lgfx-stage[data-gpu="off"] .lgfx-switch { background: rgba(255,255,255,.16); backdrop-filter: blur(10px); box-shadow: inset 0 1px rgba(255,255,255,.55); }
+.lgfx-stage[data-gpu="off"] .lgfx-switch-knob { display: block; }
+@media (max-width: 470px) { .lgfx-nav { left: 3%; width: 94%; } .lgfx-nav-item { font-size: 11px; } }
+@media (prefers-reduced-motion: reduce) { .lgfx-nav-item, .lgfx-switch-knob { transition: none; } }
+@media (forced-colors: active) { .lgfx-nav, .lgfx-switch, .lgfx-nav-item[data-active="true"] { outline: 1px solid CanvasText; } }
