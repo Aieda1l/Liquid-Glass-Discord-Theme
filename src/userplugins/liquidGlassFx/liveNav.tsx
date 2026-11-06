@@ -1,7 +1,7 @@
 /** Experimental Stage B: one decorative, pointer-transparent GPU overlay for visible server channel rows. */
 import { React } from "@webpack/common";
 import { rectInCanvasSpace } from "./coordinates";
-import { selectionInViewport } from "./liveGeometry";
+import { scrollAffectsViewport, selectionInViewport } from "./liveGeometry";
 import { advanceLiquidMotion, liquidAtRest, makeLiquidMotion, retargetLiquidMotion, type LiquidMotion } from "./motion";
 import { createLiveRenderer, type LiveRenderer } from "./liveRenderer";
 
@@ -54,7 +54,11 @@ class ChannelOverlay {
         this.schedule();
     }
 
-    private readonly onScroll = () => this.reposition();
+    private readonly onScroll = (event: Event) => {
+        // A message-pane scroll is common during channel selection. It must not
+        // reset the channel spring before the visible head/tail have traveled.
+        if (scrollAffectsViewport(this.scrollHost, event.target)) this.reposition();
+    };
     private readonly reposition = () => {
         this.snapNext = true; // scrolling or zooming should never leave the highlight behind its hitbox
         this.schedule();

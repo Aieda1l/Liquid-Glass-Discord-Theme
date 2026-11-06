@@ -56,7 +56,11 @@ void main() {
             ripple += ring.w * exp(-ring.z * 7.0) * exp(-distance*distance / 180.0);
         }
     }
-    float alpha = uIntensity * clamp(inside * (0.12 + 0.10 * highlight) + edge * 0.27 + ripple * 0.10, 0.0, 0.58);
+    // Stronger moving meniscus: visible during a transition, still subdued at rest.
+    float motionAmount = clamp(abs(uHeadY - uTailY) / max(uSelection.w, 1.0), 0.0, 1.0);
+    float movingGlint = motionAmount * edge * 0.28;
+    float alpha = uIntensity * clamp(inside * (0.12 + 0.10 * highlight) +
+                                   edge * 0.38 + movingGlint + ripple * 0.14, 0.0, 0.68);
     vec3 tint = mix(vec3(0.37,0.24,0.88), vec3(0.92,0.85,1.0),
                     clamp(0.35 + highlight * 0.65 + edge * 0.45, 0.0, 1.0));
     gl_FragColor = vec4(tint, alpha);

@@ -65,3 +65,24 @@ test('channel row anchors registered before plugin start are replayed when overl
     assert.match(source, /for \(const \[id, row\] of anchorRows\)/);
     assert.match(source, /anchorRows\.set\(channelId, row\)/);
 });
+
+test('chat scrolling does not reset the live channel spring; channel-list scrolling does', async () => {
+    const { scrollAffectsViewport } = await import(new URL('liveGeometry.ts', dir));
+    const channelSubScroller = { nodeType: 1 };
+    const chatScroller = { nodeType: 1 };
+    const viewport = { contains: node => node === channelSubScroller };
+    assert.equal(scrollAffectsViewport(viewport, chatScroller), false);
+    assert.equal(scrollAffectsViewport(viewport, viewport), true);
+    assert.equal(scrollAffectsViewport(viewport, channelSubScroller), true);
+    assert.equal(scrollAffectsViewport(null, chatScroller), false);
+    const source = read('liveNav.tsx');
+    assert.match(source, /scrollAffectsViewport\(this\.scrollHost, event\.target\)/);
+    assert.doesNotMatch(source, /private readonly onScroll = \(\) => this\.reposition\(\)/);
+});
+
+test('the live glass rim is enhanced only when the two motion lobes separate', () => {
+    const source = read('liveRenderer.ts');
+    assert.match(source, /float motionAmount = clamp\(abs\(uHeadY - uTailY\)/);
+    assert.match(source, /float movingGlint = motionAmount \* edge/);
+    assert.match(source, /edge \* 0\.38 \+ movingGlint/);
+});

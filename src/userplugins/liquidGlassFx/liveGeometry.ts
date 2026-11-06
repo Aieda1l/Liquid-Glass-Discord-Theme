@@ -12,3 +12,12 @@ export function selectionInViewport(row: Bounds, viewport: Bounds): boolean {
     return right > left && bottom - top >= row.height * 0.4;
 }
 
+/** Only a scroll within the channel-list viewport should snap its liquid indicator.
+ * Capturing scroll at the document level also sees chat/message scrolling. */
+export function scrollAffectsViewport(
+    viewport: { contains(node: Node): boolean; } | null,
+    target: EventTarget | null
+): boolean {
+    return !!viewport && !!target && (target === viewport ||
+        ("nodeType" in target && viewport.contains(target as Node)));
+}
