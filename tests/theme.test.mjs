@@ -22,7 +22,7 @@ test("valid CSS syntax and substantive stylesheet", () => {
 test("correct and self-contained theme metadata", () => {
   assert.match(css, /@name Reze Boom — Liquid Glass/);
   assert.match(css, /@author a1edail/);
-  assert.match(css, /@version 4\.1\.0/);
+  assert.match(css, /@version 4\.2\.0/);
   assert.match(css, /@source https:\/\/github\.com\/Aieda1l\/Liquid-Glass-Discord-Theme/);
   assert.match(css, /@updateUrl https:\/\/raw\.githubusercontent\.com\/Aieda1l\/Liquid-Glass-Discord-Theme\/main\/RezeBoom\.theme\.css/);
   assert.doesNotMatch(css, /@invite\b/);
@@ -70,4 +70,50 @@ test("animation accessibility and focus styles remain present", () => {
 test("theme CSS contains no javascript protocol or embedded remote execution", () => {
   assert.doesNotMatch(css, /javascript\s*:/i);
   assert.doesNotMatch(css, /@import[^;]*naat/i);
+});
+
+test("liquid optics cover navigation, switch states and layered glass", () => {
+  assert.match(css, /LIQUID OPTICS — WATERLINE/);
+  assert.ok(findRules('[role="switch"]').length > 0);
+  assert.ok(findRules('[aria-checked="true"]').length > 0);
+  assert.ok(findRules('[class*="modeSelected_"]').length > 0);
+  assert.ok(findRules('channelTextArea_').length > 0);
+  assert.ok(findRules('rz-liquid-settle').length > 0 || css.includes('@keyframes rz-liquid-settle'));
+
+  const pane = findRules('[class*="modal_"]').find(rule =>
+    rule.selector.includes('menu_') && rule.nodes.some(n => n.prop === "background"));
+  assert.ok(pane, "modal and menu optical surfaces should be present");
+  const background = pane.nodes.find(n => n.type === "decl" && n.prop === "background")?.value || "";
+  assert.match(background, /radial-gradient/);
+  assert.match(background, /linear-gradient/);
+});
+
+test("switch decoration cannot block interaction", () => {
+  const track = findRules('[role="switch"]::after').find(rule =>
+    rule.selector.trim() === '#app-mount [role="switch"]::after');
+  assert.ok(track);
+  assert.ok(track.nodes.some(n => n.type === "decl" &&
+    n.prop === "pointer-events" && n.value === "none"));
+});
+
+test("liquid motion is not continuous and has accessibility alternatives", () => {
+  const markers = [];
+  root.walkAtRules("media", rule => markers.push(rule.params));
+  assert.ok(markers.some(p => p.includes("prefers-reduced-motion")));
+  assert.ok(markers.some(p => p.includes("forced-colors")));
+  const baseRim = findRules('::after').find(rule =>
+    rule.selector.includes('[class*="modal_"]') &&
+    rule.nodes.some(n => n.prop === "animation-play-state" && n.value.includes("paused")));
+  assert.ok(baseRim, "hero glass rim should be paused until interaction");
+  const media = [];
+  root.walkAtRules("media", rule => {
+    if (rule.params.includes("prefers-reduced-motion")) media.push(rule.toString());
+  });
+  assert.ok(media.some(text => text.includes("rz-liquid-settle") || text.includes('[role="switch"]')));
+});
+
+test("CSS-only theme does not embed runtime scripts or shader canvases", () => {
+  assert.doesNotMatch(css, /<script\b/i);
+  assert.doesNotMatch(css, /@import[^;]*\.jsx?/i);
+  assert.match(css, /The references implement their fluid surfaces with React \+ WebGL/);
 });

@@ -1,8 +1,8 @@
 /**
  * @name Reze Boom — Liquid Glass
  * @author a1edail
- * @version 4.1.0
- * @description Violet liquid-glass Discord theme with a wallpaper, translucent panels, polished highlights and a subtle server glow.
+ * @version 4.2.0
+ * @description Wallpaper-backed liquid glass with refractive-looking rims, glossy controls, water-like selection and violet ambient light.
  * @source https://github.com/Aieda1l/Liquid-Glass-Discord-Theme
  * @updateUrl https://raw.githubusercontent.com/Aieda1l/Liquid-Glass-Discord-Theme/main/RezeBoom.theme.css
  *
@@ -1443,5 +1443,351 @@ button[class*="button-"][class*="primary"]:active {
   #app-mount [class*="containerBorderRadius_"] {
     transition: none !important;
     transform: none !important;
+  }
+}
+/* ================================================================
+   LIQUID OPTICS — WATERLINE / SURFACE TENSION INSPIRED
+   ================================================================
+   CSS-only interpretation of the supplied Nimbus Liquid Navbar / Toggle:
+   clear tinted body, thick meniscus, soft chromatic edge, caustic glints,
+   springy selection and a responsive glass switch.
+
+   The references implement their fluid surfaces with React + WebGL.
+   A theme.css file cannot create those shaders, sample pixels or inject
+   React into Discord. Native backdrop blur and layered optical highlights
+   are the reliable, low-cost approximation for a Vencord theme.
+
+   Keep selectors scoped and animations interaction-triggered: never blur
+   all messages or animate every surface during idle.
+   ================================================================ */
+
+:root {
+  --rz-liquid-veil: rgba(27, 19, 56, 0.26);
+  --rz-liquid-depth: rgba(14, 10, 36, 0.61);
+  --rz-liquid-top: rgba(255, 255, 255, 0.42);
+  --rz-liquid-rim: rgba(226, 239, 255, 0.54);
+  --rz-liquid-bottom: rgba(104, 131, 240, 0.26);
+  --rz-liquid-glint: rgba(255, 255, 255, 0.23);
+  --rz-liquid-accent: rgba(168, 135, 255, 0.48);
+  --rz-liquid-focus: rgba(182, 160, 255, 0.75);
+  --rz-liquid-spring: cubic-bezier(0.18, 1.32, 0.36, 1);
+  --rz-liquid-speed: 340ms;
+}
+
+/* Large architectural panes: layered translucency instead of opaque panels.
+   Existing sidebar/server pseudo-elements remain intact. */
+#app-mount :is(
+  [class^="guilds_"], [class*=" guilds_"],
+  [class^="guilds-"], [class*=" guilds-"],
+  [class^="sidebar_"], [class*=" sidebar_"],
+  [class^="sidebar-"], [class*=" sidebar-"],
+  [class^="membersWrap_"], [class*=" membersWrap_"],
+  [class^="membersWrap-"], [class*=" membersWrap-"]
+) {
+  background:
+    radial-gradient(ellipse 150% 55% at 8% 0%, rgba(255, 255, 255, 0.085), transparent 57%),
+    linear-gradient(155deg, rgba(172, 149, 245, 0.068), transparent 42%, rgba(68, 50, 148, 0.055)),
+    var(--rz-glass-frost) !important;
+  border-color: rgba(245, 246, 255, 0.13) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 1px 0 0 rgba(255, 255, 255, 0.08),
+    inset -1px 0 0 rgba(255, 255, 255, 0.035),
+    3px 0 28px rgba(5, 3, 19, 0.26) !important;
+  -webkit-backdrop-filter: blur(var(--rz-blur-medium)) saturate(155%) brightness(1.04) !important;
+  backdrop-filter: blur(var(--rz-blur-medium)) saturate(155%) brightness(1.04) !important;
+}
+
+#app-mount section[aria-label="User area"] {
+  background:
+    radial-gradient(ellipse 110% 90% at 10% -35%, rgba(255, 255, 255, 0.15), transparent 68%),
+    linear-gradient(170deg, rgba(129, 116, 229, 0.12), transparent 55%),
+    var(--rz-liquid-depth) !important;
+  border-top: 1px solid var(--rz-liquid-rim) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.19),
+    inset 0 -2px 6px rgba(25, 11, 61, 0.18),
+    0 -8px 25px rgba(3, 2, 14, 0.23) !important;
+}
+
+/* Hero glass: spectral glints above a clear violet fluid body. */
+#app-mount :is(
+  [class*="modal_"], [class*="modal-"],
+  [class*="userPopout_"], [class*="userPopout-"],
+  [class*="userProfile_"], [class*="userProfile-"],
+  [class*="contextMenu_"], [class*="contextMenu-"],
+  [class*="menu_"][role="menu"], [class*="menu-"][role="menu"],
+  [class*="searchResultsWrap_"], [class*="searchResultsWrap-"]
+),
+#app-mount [class*="drawerSizingWrapper_"] > [class*="contentWrapper_"] {
+  background:
+    radial-gradient(ellipse 95% 45% at 13% -7%, rgba(255, 255, 255, 0.18), transparent 75%),
+    linear-gradient(130deg, rgba(202, 204, 255, 0.12), transparent 32%, rgba(83, 63, 166, 0.075) 100%),
+    var(--rz-liquid-depth) !important;
+  border: 1px solid rgba(222, 230, 255, 0.24) !important;
+  box-shadow:
+    inset 0 1.5px 1px var(--rz-liquid-top),
+    inset 1px 0 1px rgba(255, 255, 255, 0.16),
+    inset -1px 0 2px rgba(146, 157, 255, 0.09),
+    inset 0 -3px 9px var(--rz-liquid-bottom),
+    0 18px 56px rgba(3, 1, 14, 0.43),
+    0 0 34px rgba(118, 83, 236, 0.09) !important;
+  -webkit-backdrop-filter: blur(var(--rz-blur-heavy)) saturate(165%) brightness(1.065) !important;
+  backdrop-filter: blur(var(--rz-blur-heavy)) saturate(165%) brightness(1.065) !important;
+}
+
+/* Optical caustic: bright crescent and subtle violet/blue edge separation.
+   The existing ::before is decorative and has pointer-events: none. */
+#app-mount :is(
+  [class*="modal_"], [class*="modal-"],
+  [class*="userPopout_"], [class*="userPopout-"],
+  [class*="userProfile_"], [class*="userProfile-"],
+  [class*="contextMenu_"], [class*="contextMenu-"],
+  [class*="menu_"][role="menu"], [class*="menu-"][role="menu"]
+)::before {
+  background:
+    radial-gradient(ellipse 72% 30% at 18% 0%, var(--rz-liquid-glint), transparent 78%),
+    radial-gradient(ellipse 72% 55% at 100% 92%, rgba(102, 150, 255, 0.10), transparent 74%),
+    radial-gradient(ellipse 40% 65% at 0% 55%, rgba(255, 110, 175, 0.07), transparent 77%),
+    linear-gradient(150deg, rgba(255, 255, 255, 0.08), transparent 36%, rgba(90, 115, 255, 0.05) 100%) !important;
+  opacity: 0.86;
+  transition: opacity var(--rz-liquid-speed) ease !important;
+  pointer-events: none !important;
+}
+
+/* The existing masked conic rim is a "wet" highlight, not a perpetual
+   spinning spinner. Run it only when the user interacts with the surface. */
+#app-mount :is(
+  [class*="modal_"], [class*="modal-"],
+  [class*="userPopout_"], [class*="userPopout-"],
+  [class*="userProfile_"], [class*="userProfile-"],
+  [class*="contextMenu_"], [class*="contextMenu-"],
+  [class*="menu_"][role="menu"], [class*="menu-"][role="menu"]
+)::after {
+  background: conic-gradient(from var(--rz-rim-angle),
+    rgba(255, 255, 255, 0.85) 0deg,
+    rgba(197, 220, 255, 0.34) 22deg,
+    transparent 55deg 158deg,
+    rgba(172, 134, 255, 0.48) 188deg,
+    transparent 227deg 322deg,
+    rgba(255, 255, 255, 0.85) 360deg) !important;
+  opacity: 0.68;
+  animation-play-state: paused !important;
+  transition: opacity var(--rz-liquid-speed) ease !important;
+}
+
+#app-mount :is(
+  [class*="modal_"], [class*="modal-"],
+  [class*="userPopout_"], [class*="userPopout-"],
+  [class*="userProfile_"], [class*="userProfile-"],
+  [class*="contextMenu_"], [class*="contextMenu-"],
+  [class*="menu_"][role="menu"], [class*="menu-"][role="menu"]
+):is(:hover, :focus-within)::after {
+  opacity: 1;
+  animation-play-state: running !important;
+}
+
+/* Message composer: an immersed glass capsule, not a flat rectangle. */
+#app-mount :is([class*="channelTextArea_"], [class*="channelTextArea-"]) {
+  background:
+    radial-gradient(ellipse 82% 82% at 8% -25%, rgba(255, 255, 255, 0.14), transparent 78%),
+    linear-gradient(168deg, rgba(162, 145, 255, 0.08), rgba(12, 8, 33, 0.25)),
+    var(--rz-liquid-veil) !important;
+  border: 1px solid rgba(225, 235, 255, 0.20) !important;
+  border-radius: var(--rz-radius-lg) !important;
+  box-shadow:
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.28),
+    inset 0 -2px 5px rgba(75, 63, 165, 0.24),
+    0 6px 21px rgba(3, 1, 16, 0.22) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(155%) !important;
+  backdrop-filter: blur(12px) saturate(155%) !important;
+}
+
+#app-mount :is([class*="channelTextArea_"], [class*="channelTextArea-"]):focus-within {
+  border-color: var(--rz-liquid-focus) !important;
+  box-shadow:
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.38),
+    inset 0 -2px 8px rgba(120, 108, 235, 0.27),
+    0 0 0 1px rgba(182, 160, 255, 0.31),
+    0 0 21px rgba(144, 112, 255, 0.18) !important;
+}
+
+/* WATERLINE: channel rows and DMs become soft glass pills on interaction.
+   Use selected-state hashes only as substrings; do not depend on a full hash.
+   The highlight is attached to the actual click target. */
+#app-mount [class*="sidebar_"] [class*="link_"]:hover,
+#app-mount [class*="sidebar_"] [class*="modeSelected_"] [class*="link_"],
+#app-mount [class*="privateChannels_"] [class*="channel_"]:hover,
+#app-mount [class*="privateChannels_"] [class*="channel_"][class*="selected_"],
+#app-mount [class*="privateChannels_"] [class*="channel_"][aria-selected="true"] {
+  border-radius: 999px !important;
+  background:
+    radial-gradient(ellipse 110% 90% at 27% 0%, rgba(255, 255, 255, 0.22), transparent 54%),
+    linear-gradient(120deg, rgba(210, 220, 255, 0.13), rgba(118, 92, 233, 0.15)) !important;
+  border: 1px solid rgba(232, 238, 255, 0.25) !important;
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.36),
+    inset 0 -2px 5px rgba(105, 92, 199, 0.16),
+    0 4px 14px rgba(7, 3, 25, 0.20) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(155%) brightness(1.06) !important;
+  backdrop-filter: blur(8px) saturate(155%) brightness(1.06) !important;
+}
+
+#app-mount [class*="sidebar_"] [class*="link_"],
+#app-mount [class*="privateChannels_"] [class*="channel_"] {
+  border: 1px solid transparent;
+  transition:
+    background-color var(--rz-liquid-speed) ease,
+    border-color var(--rz-liquid-speed) ease,
+    box-shadow var(--rz-liquid-speed) ease,
+    transform var(--rz-liquid-speed) var(--rz-liquid-spring) !important;
+}
+
+#app-mount [class*="sidebar_"] [class*="modeSelected_"] [class*="link_"],
+#app-mount [class*="privateChannels_"] [class*="channel_"][class*="selected_"] {
+  animation: rz-liquid-settle 460ms var(--rz-liquid-spring) both;
+}
+
+@keyframes rz-liquid-settle {
+  0% { scale: 0.94 0.88; }
+  56% { scale: 1.025 1.06; }
+  100% { scale: 1 1; }
+}
+
+/* Surface Tension: a rounded switch track, brighter when checked.
+   Do not replace Discord's functional knob or its event handlers. */
+#app-mount [role="switch"] {
+  position: relative;
+  border: 1px solid rgba(225, 233, 255, 0.30) !important;
+  border-radius: 999px !important;
+  background:
+    radial-gradient(ellipse 90% 100% at 20% 0%, rgba(255, 255, 255, 0.20), transparent 72%),
+    linear-gradient(180deg, rgba(116, 101, 185, 0.38), rgba(36, 25, 76, 0.56)) !important;
+  box-shadow:
+    inset 0 2px 5px rgba(0, 0, 0, 0.25),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.30),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
+    0 5px 15px rgba(4, 1, 20, 0.24) !important;
+  transition: background-color var(--rz-liquid-speed) ease,
+              box-shadow var(--rz-liquid-speed) ease !important;
+}
+
+#app-mount [role="switch"][aria-checked="true"] {
+  background:
+    radial-gradient(ellipse 100% 90% at 24% -10%, rgba(255, 255, 255, 0.40), transparent 70%),
+    linear-gradient(135deg, rgba(175, 152, 255, 0.92), rgba(86, 62, 198, 0.94)) !important;
+  border-color: rgba(238, 240, 255, 0.68) !important;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.52),
+    inset 0 -3px 9px rgba(34, 20, 109, 0.22),
+    0 0 0 1px rgba(185, 158, 255, 0.20),
+    0 5px 19px rgba(107, 75, 230, 0.31) !important;
+}
+
+/* A light meniscus on the track. This overlay does not intercept clicks. */
+#app-mount [role="switch"]::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent 42%, rgba(95, 120, 255, 0.08));
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+/* Animate scale independently from Discord's knob translation transform. */
+#app-mount [role="switch"] :is([class*="slider_"], [class*="thumb_"], [class*="handle_"]) {
+  border-radius: 999px !important;
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.84),
+    inset 0 -2px 5px rgba(110, 139, 255, 0.28),
+    0 3px 9px rgba(14, 10, 48, 0.35) !important;
+  transition: scale 300ms var(--rz-liquid-spring) !important;
+}
+
+#app-mount [role="switch"]:active :is([class*="slider_"], [class*="thumb_"], [class*="handle_"]) {
+  scale: 1.13 0.91;
+}
+
+#app-mount [role="switch"]:focus-visible {
+  outline: 2px solid var(--rz-liquid-focus) !important;
+  outline-offset: 3px !important;
+}
+
+/* Smaller controls: specular top edge and restrained depth, with no
+   full-time blur on every button. Primary button colors remain readable. */
+#app-mount :is(
+  button[class*="button_"],
+  button[class*="button-"],
+  [class*="actionButton_"],
+  [class*="actionButton-"]
+) {
+  border-radius: 999px;
+  background-image:
+    radial-gradient(ellipse 95% 85% at 28% -30%, rgba(255, 255, 255, 0.30), transparent 74%),
+    linear-gradient(170deg, rgba(255, 255, 255, 0.10), transparent 43%, rgba(94, 87, 191, 0.13)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 3px rgba(40, 28, 105, 0.12),
+    0 2px 7px rgba(1, 0, 14, 0.18) !important;
+}
+
+#app-mount :is(
+  button[class*="button_"],
+  button[class*="button-"],
+  [class*="actionButton_"],
+  [class*="actionButton-"]
+):hover {
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.44),
+    inset 0 -2px 5px rgba(98, 85, 215, 0.17),
+    0 5px 15px rgba(30, 15, 95, 0.25),
+    0 0 0 1px rgba(230, 237, 255, 0.21) !important;
+}
+
+#app-mount :is(
+  button[class*="button_"],
+  button[class*="button-"]
+):focus-visible {
+  outline: 2px solid var(--rz-liquid-focus) !important;
+  outline-offset: 2px !important;
+}
+
+/* A moving meniscus is optional visual polish, not a required control cue. */
+@media (prefers-reduced-motion: reduce) {
+  #app-mount [class*="sidebar_"] [class*="modeSelected_"] [class*="link_"],
+  #app-mount [class*="privateChannels_"] [class*="channel_"][class*="selected_"] {
+    animation: none !important;
+    scale: 1 !important;
+  }
+  #app-mount [role="switch"],
+  #app-mount [role="switch"] :is([class*="slider_"], [class*="thumb_"], [class*="handle_"]),
+  #app-mount [class*="sidebar_"] [class*="link_"],
+  #app-mount [class*="privateChannels_"] [class*="channel_"] {
+    transition: none !important;
+    scale: 1 !important;
+  }
+  #app-mount :is(
+    [class*="modal_"], [class*="modal-"],
+    [class*="userPopout_"], [class*="userPopout-"],
+    [class*="userProfile_"], [class*="userProfile-"],
+    [class*="contextMenu_"], [class*="contextMenu-"],
+    [class*="menu_"][role="menu"], [class*="menu-"][role="menu"]
+  )::after {
+    animation: none !important;
+  }
+}
+
+/* Respect platform contrast choices without destroying keyboard focus. */
+@media (forced-colors: active) {
+  #app-mount [role="switch"],
+  #app-mount [role="switch"][aria-checked="true"],
+  #app-mount [class*="sidebar_"] [class*="link_"],
+  #app-mount [class*="privateChannels_"] [class*="channel_"] {
+    background-image: none !important;
+    border-color: ButtonText !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
   }
 }
