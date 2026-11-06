@@ -38,7 +38,7 @@ Open `RezeBoom.theme.css` and edit the variables at the beginning of the `:root`
 | `--rz-chat-history-blur` | Chat-only backdrop blur (6px default; reduced to preserve wallpaper detail). |
 | `--rz-chat-history-tint` | Dark translucent color behind messages (default alpha 0.32). |
 | `--rz-composer-tint` | Glass tint for the message composer capsule. |
-| `--rz-quest-card-tint` | Glass tint for the Quest bar above the user panel. |
+| `--rz-quest-card-tint` | Higher-opacity glass tint for the Quest card (0.88 by default) to prevent underlying sidebar content showing through. |
 | `--rz-folder-glass-tint`, `--rz-folder-glass-blur` | Translucency and blur on server folder buttons and expanded folder backings. |
 | `--rz-icon-hover-glow` | Glow intensity on the icon art only, not unread or selection indicators. |
 
@@ -55,10 +55,13 @@ Use a directly accessible HTTPS image URL, not a web page URL. The theme renders
 
 ## Liquid-glass design
 
-Version **4.2.2** draws from the **Waterline** (liquid navbar) and **Surface Tension** (liquid toggle) React examples supplied by the user, credited in their headers to [guglielmogiannattasio.it](https://guglielmogiannattasio.it/). This theme adapts the **appearance** rather than copying their JavaScript or WebGL shader.
+Version **4.2.3** draws from the **Waterline** (liquid navbar) and **Surface Tension** (liquid toggle) React examples supplied by the user, credited in their headers to [guglielmogiannattasio.it](https://guglielmogiannattasio.it/). This theme adapts the **appearance** rather than copying their JavaScript or WebGL shader.
 
 - **Selected channels and DMs:** curved translucent pill selection, specular meniscus highlights, subtle spring-settle.
 - **Server folders and glyphs:** glass button/expanded folder backings; folder glyph, miniature previews, unread indicator and badge geometry are left to Discord.
+- **Tooltips and menus:** one glass frame on each tooltip shell; inner tooltip content is unpainted to prevent double rectangles.
+- **User panel controls:** microphone/headphone dropdown chevrons retain their native button hit targets and focus outlines without independent glass capsules.
+- **Quest popup:** one strong but translucent outer glass layer; no nested quest-card coating and no hiding the actual menu/control buttons.
 - **Server-icon glow:** restricted to actual icon artwork on hover, not the surrounding server list item or unread pill.
 - **Switches:** a glassy stateful track, white reflected rims, and a compressed knob on press (where Discord exposes a recognizable knob).
 - **Menus, popouts and modals:** layered caustics, violet/blue edge fringing and paused-at-rest optical rims.
@@ -79,7 +82,9 @@ Use Windows **Reduce Motion** if you prefer static effects. Forced-colors mode a
 - **Chat is too dark/too clear:** Adjust `--rz-chat-history-tint` alpha (e.g. `0.22` for more wallpaper, `0.45` for easier text reading) and `--rz-chat-history-blur` (e.g. `3px`–`10px`).
 - **Quest still looks opaque:** The current Quest bar uses `[data-testid="quest-bar-container"]` in observed Discord builds; future updates may change it. If it changes, submit a screenshot and DOM selector info rather than applying a global transparency override.
 - **Lag on older GPUs:** Reduce the `--rz-blur-*` variables or enable **Reduce Motion** in your OS accessibility settings.
-- **Folder icons misaligned or strange unread dots:** Disable any older QuickCSS server-glow/folder overrides and make sure only one copy of this theme is enabled. Version 4.2.2 no longer animates the server list item or its pseudo-elements.
+- **Folder icons misaligned or strange unread dots:** Disable any older QuickCSS server-glow/folder overrides and make sure only one copy of this theme is enabled. Since v4.2.2 no longer animates the server list item or its pseudo-elements.
+- **Double tooltip outline / doubled Quest dates:** Recheck version 4.2.3, remove old QuickCSS overrides, and reload. The Quest card uses a darker glass tint to conceal content beneath it; the 3-dot menu is preserved if Discord provides it.
+- **Extra pills on sound/dropdown arrows:** The theme no longer paints arbitrary `button_` classes. If separate pills remain, they may be native Discord buttons or contributed by another plugin; compare with themes disabled.
 - **Theme does not update:** Remove and re-add the Online Theme URL, or download the latest CSS for local use.
 
 ## Styling coverage and limits
