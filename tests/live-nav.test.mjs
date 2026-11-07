@@ -86,3 +86,28 @@ test('the live glass rim is enhanced only when the two motion lobes separate', (
     assert.match(source, /float movingGlint = motionAmount \* edge/);
     assert.match(source, /edge \* 0\.38 \+ movingGlint/);
 });
+
+
+test('long channel jumps render only a short, narrow tail near the moving head', async () => {
+    const { compactLiveTrail } = await import(new URL('liveGeometry.ts', dir));
+    const rect = { x: 28, y: 160, width: 336, height: 40 };
+    const jumpingDown = compactLiveTrail(rect, 210, 550);
+    assert.ok(jumpingDown.width <= 42, `tail width ${jumpingDown.width}`);
+    assert.ok(jumpingDown.width <= rect.width * 0.15, 'tail must not be another channel-width pill');
+    assert.ok(jumpingDown.height <= 10, 'tail height stays small');
+    assert.ok(Math.abs(jumpingDown.y + jumpingDown.height / 2 - 210) <= rect.height * 0.56,
+        'tail stays close to animated head, not at old channel');
+    assert.equal(jumpingDown.x + jumpingDown.width / 2, rect.x + rect.width / 2);
+    const jumpingUp = compactLiveTrail(rect, 550, 210);
+    assert.ok(jumpingUp.y + jumpingUp.height / 2 < 550, 'tail stays behind upward motion');
+    assert.ok(Math.abs(jumpingUp.y + jumpingUp.height / 2 - 550) <= rect.height * 0.56);
+});
+
+test('live shader renders a compact trailing meniscus and contracts the head during long travel', () => {
+    const source = read('liveRenderer.ts');
+    assert.match(source, /uniform vec4 uTrail;/);
+    assert.match(source, /compactLiveTrail\(/);
+    assert.match(source, /gl\.uniform4f\(locations\.uTrail/);
+    assert.match(source, /float targetGap = abs\(uHeadY - uSelection\.y\)/);
+    assert.doesNotMatch(source, /halfSize\.x \* \(0\.80/, 'do not render another almost-full-width pill behind the head');
+});

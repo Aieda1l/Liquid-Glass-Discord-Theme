@@ -21,3 +21,25 @@ export function scrollAffectsViewport(
     return !!viewport && !!target && (target === viewport ||
         ("nodeType" in target && viewport.contains(target as Node)));
 }
+
+/**
+ * Live-channel motion is vertical. Keep the trailing meniscus close to the
+ * moving selection, even when the old channel is many rows away. Rendering
+ * a second channel-width pill at tailY creates detached ghost capsules.
+ */
+export function compactLiveTrail(
+    selection: { x: number; y: number; width: number; height: number; },
+    headY: number,
+    tailY: number
+): { x: number; y: number; width: number; height: number; } {
+    const width = Math.max(0, Math.min(42, selection.width * 0.10));
+    const height = Math.max(0, Math.min(10, selection.height * 0.23));
+    const maxOffset = Math.max(0, selection.height * 0.55);
+    const dy = Math.max(-maxOffset, Math.min(maxOffset, tailY - headY));
+    return {
+        x: selection.x + (selection.width - width) * 0.5,
+        y: headY + dy - height * 0.5,
+        width,
+        height
+    };
+}
