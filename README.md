@@ -69,7 +69,7 @@ Version **4.2.4** draws from the **Waterline** (liquid navbar) and **Surface Ten
 - **Additional UI:** scoped styling for search, settings cards, reactions, embeds, polls, member row hovers, and toolbar hover states.
 - **Message composer, Quest bar and small buttons:** translucent wet-glass reflections, preserved interactive controls, and a blurred background behind their surfaces.
 
-**Planned follow-up:** [Real-time Vencord liquid-glass userplugin design](docs/VENCORD_PLUGIN_PLAN.md) describes a separate WebGL/React enhancement, current technical limits, and the source-build installation requirement. **The plugin is planned, not implemented.**
+**Experimental WebGL companion (Stage A):** [`LiquidGlassFx`](src/userplugins/liquidGlassFx/README.md) now contains a source-build Vencord settings preview with an original GPU shader, generated-wallpaper refraction, a liquid navigation indicator and a spring-like toggle. This is **not** active in Discord's live UI yet: it must be copied into a source-built Vencord checkout, and GPU/client verification is still outstanding. The [integration plan](docs/VENCORD_PLUGIN_PLAN.md) describes those next steps.
 
 **Important:** Vencord themes are CSS, not React. Genuine pixel-by-pixel water refraction, arbitrary cursor-tracking ripples, droplet splits and physically simulated knob movement need WebGL/JavaScript integration and **are not present** in the theme. The CSS deliberately approximates those visuals to stay compatible with Discord and minimize animation overhead. Real rendered output varies with Discord builds.
 
